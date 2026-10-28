@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { Bike, CheckCircle, CookingPot, Home } from "lucide-react";
 import { SiteShell } from "../components/SiteShell";
 import { formatPrice } from "../lib/pricing";
-import { getOrder, getOrders, paymentLabel, type SavedOrder } from "../lib/orders";
+import { getOrder, getOrders, orderStatus, paymentLabel, type SavedOrder } from "../lib/orders";
 
 export default function TrackOrderPage() {
   const [orderId, setOrderId] = useState("");
@@ -35,20 +35,20 @@ export default function TrackOrderPage() {
     <SiteShell>
       <main className="max-w-3xl mx-auto px-4 py-12">
         <h1 className="script-title text-6xl text-center mb-6">Track an order</h1>
-        <form onSubmit={search} className="bg-card rounded-3xl border border-[#c9b79c] p-4 flex gap-3">
+        <form onSubmit={search} className="bg-card rounded-3xl border border-[#e5dcc8] p-4 flex gap-3">
           <input
             value={orderId}
             onChange={(e) => setOrderId(e.target.value)}
             placeholder="Order ID, for example OM-482193"
             className="field"
           />
-          <button type="submit" className="bg-terra text-white font-bold px-5 rounded-full">Search</button>
+          <button type="submit" className="bg-terra text-ink font-bold px-5 rounded-full">Search</button>
         </form>
 
         {miss && <p className="mt-4 text-sm text-terra-deep">No order matches {orderId.trim() || "that id"} on this device.</p>}
 
         {result && (
-          <section className="mt-6 bg-card rounded-3xl border border-[#c9b79c] p-6">
+          <section className="mt-6 bg-card rounded-3xl border border-[#e5dcc8] p-6">
             <div className="flex flex-wrap items-end justify-between gap-3 mb-6">
               <div>
                 <p className="text-xs font-bold tracking-wide text-sage uppercase">{result.id}</p>
@@ -56,21 +56,29 @@ export default function TrackOrderPage() {
               </div>
               <p className="font-bold">{formatPrice(result.total)}</p>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center mb-6">
-              {[
-                { icon: CheckCircle, label: "Confirmed", active: true },
-                { icon: CookingPot, label: "Preparing", active: true },
-                { icon: Bike, label: "On the way", active: false },
-                { icon: Home, label: "Delivered", active: false },
-              ].map((step) => (
-                <div key={step.label} className={step.active ? "" : "opacity-40"}>
-                  <div className={`mx-auto mb-2 w-12 h-12 rounded-full flex items-center justify-center ${step.active ? "bg-sage text-white" : "bg-cream-deep text-ink"}`}>
-                    <step.icon className="w-5 h-5" />
-                  </div>
-                  <p className="text-xs font-bold">{step.label}</p>
-                </div>
-              ))}
-            </div>
+            {orderStatus(result) === "cancelled" ? (
+              <p className="mb-6 font-bold text-terra-deep">This order was cancelled.</p>
+            ) : (
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center mb-6">
+                {[
+                  { icon: CheckCircle, label: "Confirmed" },
+                  { icon: CookingPot, label: "Preparing" },
+                  { icon: Bike, label: "On the way" },
+                  { icon: Home, label: "Delivered" },
+                ].map((step, index) => {
+                  const rank = { confirmed: 0, preparing: 1, on_the_way: 2, delivered: 3 }[orderStatus(result)];
+                  const active = rank >= index;
+                  return (
+                    <div key={step.label} className={active ? "" : "opacity-40"}>
+                      <div className={`mx-auto mb-2 w-12 h-12 rounded-full flex items-center justify-center ${active ? "bg-sage text-cream" : "bg-cream-deep text-ink"}`}>
+                        <step.icon className="w-5 h-5" />
+                      </div>
+                      <p className="text-xs font-bold">{step.label}</p>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
             <ul className="text-sm space-y-2">
               {result.items.map((item) => (
                 <li key={item.id} className="flex justify-between">
@@ -96,7 +104,7 @@ export default function TrackOrderPage() {
                       setResult(order);
                       setMiss(false);
                     }}
-                    className="w-full text-left bg-card border border-[#c9b79c] rounded-2xl px-4 py-3 flex justify-between"
+                    className="w-full text-left bg-card border border-[#e5dcc8] rounded-2xl px-4 py-3 flex justify-between"
                   >
                     <span className="font-bold">{order.id}</span>
                     <span className="text-sm text-muted">{paymentLabel(order.paymentMethod)}</span>

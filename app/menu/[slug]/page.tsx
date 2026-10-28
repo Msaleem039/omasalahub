@@ -36,9 +36,9 @@ export default function CategoryMenuPage({ params }: { params: Promise<{ slug: s
             ))}
           </div>
         ) : (
-          <div className="bg-card rounded-3xl border border-[#c9b79c] p-12 text-center">
+          <div className="bg-card rounded-3xl border border-[#e5dcc8] p-12 text-center">
             <p className="text-muted">{t("That course is not on the menu.", "Cette catégorie n'est pas à la carte.")}</p>
-            <Link href="/menu" className="inline-flex mt-4 bg-terra text-white font-bold px-5 py-2.5 rounded-full">
+            <Link href="/menu" className="inline-flex mt-4 bg-terra text-ink font-bold px-5 py-2.5 rounded-full">
               {t("Browse dishes", "Voir les plats")}
             </Link>
           </div>

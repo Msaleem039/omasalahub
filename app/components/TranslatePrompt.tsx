@@ -15,8 +15,8 @@ export function TranslatePrompt() {
   if (!ready || !showPrompt) return null;
 
   return (
-    <div className="fixed top-3 left-1/2 z-[60] w-[min(92vw,22rem)] -translate-x-1/2 rounded-2xl border border-[#c9b79c] bg-card shadow-2xl">
-      <div className="flex items-center justify-end gap-2 border-b border-[#c9b79c] px-3 py-2">
+    <div className="fixed top-3 left-1/2 z-[60] w-[min(92vw,22rem)] -translate-x-1/2 rounded-2xl border border-[#e5dcc8] bg-card shadow-2xl">
+      <div className="flex items-center justify-end gap-2 border-b border-[#e5dcc8] px-3 py-2">
         <div className="mr-auto flex items-center gap-1">
           {OPTIONS.map((option) => (
             <button
@@ -40,7 +40,7 @@ export function TranslatePrompt() {
           type="checkbox"
           checked={always}
           onChange={(event) => setAlways(event.target.checked)}
-          className="h-4 w-4 accent-[#c8652c]"
+          className="h-4 w-4 accent-[#e0b15a]"
         />
         {t("Always use this language", "Toujours utiliser cette langue")}
       </label>

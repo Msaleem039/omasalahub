@@ -69,11 +69,11 @@ export const Hero: React.FC = () => {
   return (
     <section className="relative overflow-hidden">
       <div className="pointer-events-none absolute -right-16 top-0 h-72 w-72 rounded-full bg-sage-soft/80 blur-2xl" />
-      <div className="pointer-events-none absolute -left-20 bottom-0 h-64 w-64 rounded-full bg-[#c99a6a]/70 blur-2xl" />
+      <div className="pointer-events-none absolute -left-20 bottom-0 h-64 w-64 rounded-full bg-terra/20 blur-2xl" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-16 grid lg:grid-cols-2 gap-8 lg:gap-6 items-center">
         <div className="min-h-[15rem]">
-          <p className="text-sm font-semibold tracking-[0.18em] text-sage uppercase">11:00 — 23:00</p>
+          <p className="text-sm font-semibold tracking-[0.18em] text-terra uppercase">11:00 — 23:00</p>
           <AnimatePresence mode="wait">
             <motion.div
               key={dish.id}
@@ -89,7 +89,7 @@ export const Hero: React.FC = () => {
           </AnimatePresence>
           <Link
             href={`/menu/${dish.category}`}
-            className="inline-flex mt-8 bg-terra hover:bg-terra-deep text-white font-bold px-8 py-3.5 rounded-full shadow-lg shadow-terra/20"
+            className="inline-flex mt-8 bg-terra hover:bg-terra-deep text-ink font-bold px-8 py-3.5 rounded-full shadow-lg shadow-terra/20"
           >
             {t("Order Now", "Commander")}
           </Link>
@@ -152,7 +152,7 @@ export const Hero: React.FC = () => {
               type="button"
               aria-label={t("Previous dish", "Plat précédent")}
               onClick={() => go(-1)}
-              className="flex h-11 w-11 items-center justify-center rounded-full border border-[#c9b79c] bg-card text-ink hover:bg-terra hover:text-white"
+              className="flex h-11 w-11 items-center justify-center rounded-full border border-[#e5dcc8] bg-card text-ink hover:bg-terra hover:text-ink"
             >
               <ChevronLeft className="h-5 w-5" />
             </button>
@@ -163,7 +163,7 @@ export const Hero: React.FC = () => {
               type="button"
               aria-label={t("Next dish", "Plat suivant")}
               onClick={() => go(1)}
-              className="flex h-11 w-11 items-center justify-center rounded-full border border-[#c9b79c] bg-card text-ink hover:bg-terra hover:text-white"
+              className="flex h-11 w-11 items-center justify-center rounded-full border border-[#e5dcc8] bg-card text-ink hover:bg-terra hover:text-ink"
             >
               <ChevronRight className="h-5 w-5" />
             </button>

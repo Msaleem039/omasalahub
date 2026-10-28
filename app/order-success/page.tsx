@@ -22,14 +22,14 @@ export default function OrderSuccessPage() {
         angle: 60,
         spread: 50,
         origin: { x: 0, y: 0.7 },
-        colors: ["#c8652c", "#667544", "#e4d5c0", "#2c2118"],
+        colors: ["#e0b15a", "#143528", "#f8f4ea", "#12382c"],
       });
       confetti({
         particleCount: 3,
         angle: 120,
         spread: 50,
         origin: { x: 1, y: 0.7 },
-        colors: ["#c8652c", "#667544", "#e4d5c0", "#2c2118"],
+        colors: ["#e0b15a", "#143528", "#f8f4ea", "#12382c"],
       });
       if (Date.now() < end) requestAnimationFrame(frame);
     };
@@ -39,7 +39,7 @@ export default function OrderSuccessPage() {
   return (
     <SiteShell>
       <main className="max-w-xl mx-auto px-4 py-16">
-        <div className="bg-card rounded-[2rem] border border-[#c9b79c] p-8 sm:p-10 text-center shadow-sm">
+        <div className="bg-card rounded-[2rem] border border-[#e5dcc8] p-8 sm:p-10 text-center shadow-sm">
           <div className="mx-auto mb-4 w-16 h-16 rounded-full bg-sage-soft text-sage flex items-center justify-center">
             <CheckCircle2 className="w-9 h-9" />
           </div>
@@ -77,7 +77,7 @@ export default function OrderSuccessPage() {
             <Link href={order ? `/track-order?id=${order.id}` : "/track-order"} className="flex items-center justify-center gap-2 bg-ink text-cream font-bold py-3 rounded-full">
               Track this order <ArrowRight className="w-4 h-4" />
             </Link>
-            <Link href="/menu" className="block bg-terra text-white font-bold py-3 rounded-full">
+            <Link href="/menu" className="block bg-terra text-ink font-bold py-3 rounded-full">
               Order something else
             </Link>
           </div>

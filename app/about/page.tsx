@@ -15,9 +15,9 @@ export default function AboutPage() {
             <p className="text-sage font-bold tracking-[0.16em] uppercase text-xs">Our kitchen</p>
             <h1 className="script-title text-7xl mt-2">Cooked slowly, served hot.</h1>
             <p className="text-muted mt-4 leading-relaxed">
-              omasalahub cooks the dishes on our card: butter chicken and the other specialties with basmati rice, chicken and vegetable biryani, stuffed naan, house-sauce pizzas, samosas, and lassi.
+              Masala Hub cooks the dishes on our card: butter chicken and the other specialties with basmati rice, chicken and vegetable biryani, stuffed naan, house-sauce pizzas, samosas, and lassi.
             </p>
-            <div className="grid grid-cols-3 gap-4 mt-8 border-t border-[#c9b79c] pt-6">
+            <div className="grid grid-cols-3 gap-4 mt-8 border-t border-[#e5dcc8] pt-6">
               <div><p className="font-serif text-4xl text-terra">30m</p><p className="text-xs text-muted">Typical delivery</p></div>
               <div><p className="font-serif text-4xl text-terra">22</p><p className="text-xs text-muted">Dishes on the card</p></div>
               <div><p className="font-serif text-4xl text-terra">11–23</p><p className="text-xs text-muted">Kitchen hours</p></div>
@@ -26,7 +26,7 @@ export default function AboutPage() {
           <div className="relative h-80 sm:h-[420px] rounded-[2rem] overflow-hidden border-4 border-white shadow-xl">
             <Image
               src="https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=1400&q=80"
-              alt="Biryani Poulet from the omasalahub kitchen"
+              alt="Biryani Poulet from the Masala Hub kitchen"
               fill
               unoptimized
               className="object-cover"
@@ -40,7 +40,7 @@ export default function AboutPage() {
             { icon: Clock, title: "A clear kitchen clock", text: "We cook between 11:00 and 23:00, so the tandoor and the biryani pot stay in rhythm." },
             { icon: ShieldCheck, title: "A tidy pass", text: "Each box is sealed, labeled, and checked before it leaves the counter." },
           ].map((item) => (
-            <div key={item.title} className="bg-card rounded-3xl border border-[#c9b79c] p-6">
+            <div key={item.title} className="bg-card rounded-3xl border border-[#e5dcc8] p-6">
               <div className="w-11 h-11 rounded-2xl bg-sage-soft text-sage flex items-center justify-center mb-4">
                 <item.icon className="w-5 h-5" />
               </div>
@@ -55,7 +55,7 @@ export default function AboutPage() {
             <h2 className="script-title text-5xl">Hungry already?</h2>
             <p className="text-cream/80 mt-2">Start with Biryani Poulet, or build a formule with a drink.</p>
           </div>
-          <Link href="/menu" className="bg-terra text-white font-bold px-6 py-3 rounded-full text-center">
+          <Link href="/menu" className="bg-terra text-ink font-bold px-6 py-3 rounded-full text-center">
             Open the menu
           </Link>
         </section>

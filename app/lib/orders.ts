@@ -1,4 +1,7 @@
 export type PaymentMethod = "cod" | "online";
+export type OrderStatus = "confirmed" | "preparing" | "on_the_way" | "delivered" | "cancelled";
+
+export const ORDER_STATUSES: OrderStatus[] = ["confirmed", "preparing", "on_the_way", "delivered", "cancelled"];
 
 export interface OrderLine {
   id: string;
@@ -22,6 +25,7 @@ export interface SavedOrder {
     address: string;
     note: string;
   };
+  status?: OrderStatus;
   createdAt: string;
 }
 
@@ -29,6 +33,16 @@ const ORDERS_KEY = "bitebloom_orders";
 
 export function paymentLabel(method: PaymentMethod) {
   return method === "cod" ? "Cash on delivery" : "Online payment";
+}
+
+export function orderStatus(order: SavedOrder): OrderStatus {
+  return order.status ?? "confirmed";
+}
+
+export function updateOrderStatus(id: string, status: OrderStatus) {
+  const next = getOrders().map((order) => (order.id === id ? { ...order, status } : order));
+  localStorage.setItem(ORDERS_KEY, JSON.stringify(next));
+  return next;
 }
 
 export function getOrders(): SavedOrder[] {

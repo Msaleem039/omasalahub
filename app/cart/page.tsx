@@ -21,9 +21,9 @@ export default function CartPage() {
         <h1 className="script-title text-6xl mb-8">Your basket</h1>
 
         {cart.length === 0 ? (
-          <div className="bg-card rounded-3xl border border-[#c9b79c] p-12 text-center">
+          <div className="bg-card rounded-3xl border border-[#e5dcc8] p-12 text-center">
             <p className="text-muted mb-6">Your basket is empty.</p>
-            <Link href="/menu" className="bg-terra text-white font-bold px-6 py-3 rounded-full">
+            <Link href="/menu" className="bg-terra text-ink font-bold px-6 py-3 rounded-full">
               Browse the menu
             </Link>
           </div>
@@ -33,7 +33,7 @@ export default function CartPage() {
               {cart.map((item) => {
                 const quantity = item.quantity || 1;
                 return (
-                  <div key={item.id} className="bg-card rounded-3xl border border-[#c9b79c] p-4 flex items-center gap-4">
+                  <div key={item.id} className="bg-card rounded-3xl border border-[#e5dcc8] p-4 flex items-center gap-4">
                     <div className="relative w-20 h-20 rounded-2xl overflow-hidden shrink-0">
                       <Image src={item.image} alt={item.name} fill unoptimized className="object-cover" />
                     </div>
@@ -58,19 +58,19 @@ export default function CartPage() {
               })}
             </div>
 
-            <aside className="bg-card rounded-3xl border border-[#c9b79c] p-6 h-fit">
+            <aside className="bg-card rounded-3xl border border-[#e5dcc8] p-6 h-fit">
               <h2 className="font-serif text-3xl mb-4">Summary</h2>
               <div className="space-y-2 text-sm text-muted">
                 <div className="flex justify-between"><span>Subtotal</span><span>{formatPrice(subtotal)}</span></div>
                 <div className="flex justify-between"><span>Delivery</span><span>{deliveryFee === 0 ? "Free" : formatPrice(deliveryFee)}</span></div>
-                <div className="flex justify-between font-bold text-ink text-base pt-2 border-t border-[#c9b79c]">
+                <div className="flex justify-between font-bold text-ink text-base pt-2 border-t border-[#e5dcc8]">
                   <span>Total</span><span>{formatPrice(grandTotal)}</span>
                 </div>
               </div>
               {remaining > 0 && (
                 <p className="text-xs text-sage mt-3">Add {formatPrice(remaining)} for free delivery.</p>
               )}
-              <Link href="/checkout" className="mt-5 block text-center bg-terra hover:bg-terra-deep text-white font-bold py-3.5 rounded-full">
+              <Link href="/checkout" className="mt-5 block text-center bg-terra hover:bg-terra-deep text-ink font-bold py-3.5 rounded-full">
                 Checkout
               </Link>
             </aside>

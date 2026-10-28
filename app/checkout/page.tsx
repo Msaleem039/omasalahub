@@ -123,6 +123,7 @@ export default function CheckoutPage() {
         address: form.address.trim(),
         note: form.note.trim(),
       },
+      status: "confirmed" as const,
       createdAt: new Date().toISOString(),
     };
 
@@ -141,14 +142,14 @@ export default function CheckoutPage() {
         <h1 className="script-title text-6xl mb-8">Checkout</h1>
 
         {cart.length === 0 ? (
-          <div className="bg-card rounded-3xl border border-[#c9b79c] p-12 text-center">
+          <div className="bg-card rounded-3xl border border-[#e5dcc8] p-12 text-center">
             <p className="text-muted mb-5">Nothing to check out yet.</p>
-            <Link href="/menu" className="bg-terra text-white font-bold px-6 py-3 rounded-full">Open the menu</Link>
+            <Link href="/menu" className="bg-terra text-ink font-bold px-6 py-3 rounded-full">Open the menu</Link>
           </div>
         ) : (
           <form onSubmit={placeOrder} className="grid lg:grid-cols-5 gap-8">
             <div className="lg:col-span-3 space-y-6">
-              <section className="bg-card rounded-3xl border border-[#c9b79c] p-6 space-y-4">
+              <section className="bg-card rounded-3xl border border-[#e5dcc8] p-6 space-y-4">
                 <h2 className="font-serif text-3xl">Delivery</h2>
                 <label className="block text-sm font-bold">Full name
                   <input className="field mt-1" value={form.name} onChange={(e) => setField("name", e.target.value)} />
@@ -164,13 +165,13 @@ export default function CheckoutPage() {
                 </label>
               </section>
 
-              <section className="bg-card rounded-3xl border border-[#c9b79c] p-6 space-y-4">
+              <section className="bg-card rounded-3xl border border-[#e5dcc8] p-6 space-y-4">
                 <h2 className="font-serif text-3xl">Payment</h2>
                 <div className="grid sm:grid-cols-2 gap-3">
                   <button
                     type="button"
                     onClick={() => setMethod("cod")}
-                    className={`text-left rounded-2xl border p-4 ${method === "cod" ? "border-terra bg-sage-soft/40" : "border-[#c9b79c]"}`}
+                    className={`text-left rounded-2xl border p-4 ${method === "cod" ? "border-terra bg-sage-soft/40" : "border-[#e5dcc8]"}`}
                   >
                     <Banknote className="w-5 h-5 text-terra mb-2" />
                     <p className="font-bold">Cash on delivery</p>
@@ -179,7 +180,7 @@ export default function CheckoutPage() {
                   <button
                     type="button"
                     onClick={() => setMethod("online")}
-                    className={`text-left rounded-2xl border p-4 ${method === "online" ? "border-terra bg-sage-soft/40" : "border-[#c9b79c]"}`}
+                    className={`text-left rounded-2xl border p-4 ${method === "online" ? "border-terra bg-sage-soft/40" : "border-[#e5dcc8]"}`}
                   >
                     <CreditCard className="w-5 h-5 text-terra mb-2" />
                     <p className="font-bold">Online payment</p>
@@ -230,12 +231,12 @@ export default function CheckoutPage() {
               </section>
 
               {error && <p className="text-sm font-semibold text-terra-deep">{error}</p>}
-              <button type="submit" className="w-full bg-terra hover:bg-terra-deep text-white font-bold py-3.5 rounded-full">
+              <button type="submit" className="w-full bg-terra hover:bg-terra-deep text-ink font-bold py-3.5 rounded-full">
                 {method === "cod" ? `Place order · ${formatPrice(total)}` : `Pay ${formatPrice(total)}`}
               </button>
             </div>
 
-            <aside className="lg:col-span-2 bg-card rounded-3xl border border-[#c9b79c] p-6 h-fit">
+            <aside className="lg:col-span-2 bg-card rounded-3xl border border-[#e5dcc8] p-6 h-fit">
               <h2 className="font-serif text-3xl mb-4">Your dishes</h2>
               <ul className="space-y-3 text-sm">
                 {cart.map((item) => (
@@ -245,7 +246,7 @@ export default function CheckoutPage() {
                   </li>
                 ))}
               </ul>
-              <div className="mt-4 pt-4 border-t border-[#c9b79c] space-y-2 text-sm">
+              <div className="mt-4 pt-4 border-t border-[#e5dcc8] space-y-2 text-sm">
                 <div className="flex justify-between text-muted"><span>Subtotal</span><span>{formatPrice(subtotal)}</span></div>
                 <div className="flex justify-between text-muted"><span>Delivery</span><span>{deliveryFee === 0 ? "Free" : formatPrice(deliveryFee)}</span></div>
                 <div className="flex justify-between font-bold text-base"><span>Total</span><span>{formatPrice(total)}</span></div>

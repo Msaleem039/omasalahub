@@ -24,8 +24,8 @@ const script = Great_Vibes({
 });
 
 export const metadata: Metadata = {
-  title: "omasalahub - Biryani, Curries & Naans",
-  description: "Order butter chicken, biryani, naan, and house specialties from omasalahub.",
+  title: "Masala Hub - Biryani, Curries & Naans",
+  description: "Order butter chicken, biryani, naan, and house specialties from Masala Hub.",
 };
 
 export default function RootLayout({

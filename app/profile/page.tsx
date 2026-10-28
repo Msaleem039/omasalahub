@@ -59,7 +59,7 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        <form onSubmit={save} className="bg-card rounded-3xl border border-[#c9b79c] p-6 space-y-4">
+        <form onSubmit={save} className="bg-card rounded-3xl border border-[#e5dcc8] p-6 space-y-4">
           <label className="block text-sm font-bold">Name
             <input className="field mt-1" value={profile.name} onChange={(e) => setProfile({ ...profile, name: e.target.value })} />
           </label>
@@ -72,7 +72,7 @@ export default function ProfilePage() {
           <label className="block text-sm font-bold">Delivery address
             <textarea className="field mt-1" rows={3} value={profile.address} onChange={(e) => setProfile({ ...profile, address: e.target.value })} />
           </label>
-          <button type="submit" className="bg-terra text-white font-bold px-6 py-3 rounded-full">Save details</button>
+          <button type="submit" className="bg-terra text-ink font-bold px-6 py-3 rounded-full">Save details</button>
           {saved && <p className="text-sm text-sage">Saved. Checkout will use this name, phone, and address.</p>}
         </form>
 
@@ -83,7 +83,7 @@ export default function ProfilePage() {
           ) : (
             <ul className="space-y-3">
               {orders.map((order) => (
-                <li key={order.id} className="bg-card border border-[#c9b79c] rounded-2xl p-4 flex items-center justify-between gap-3">
+                <li key={order.id} className="bg-card border border-[#e5dcc8] rounded-2xl p-4 flex items-center justify-between gap-3">
                   <div>
                     <p className="font-bold">{order.id}</p>
                     <p className="text-xs text-muted">{paymentLabel(order.paymentMethod)} · {order.items.length} dishes</p>

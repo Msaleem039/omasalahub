@@ -45,7 +45,7 @@ export function DishCard({ dish }: { dish: Dish }) {
   };
 
   return (
-    <article className="bg-card rounded-[1.6rem] border border-[#c9b79c] shadow-[0_12px_30px_rgba(60,42,30,0.06)] p-3 flex flex-col">
+    <article className="bg-card rounded-[1.6rem] border border-[#e5dcc8] shadow-[0_12px_30px_rgba(20,53,40,0.06)] p-3 flex flex-col">
       <div className="relative h-52 rounded-[1.25rem] overflow-hidden bg-cream-deep">
         <Image src={dish.image} alt={dish.name} fill unoptimized className="object-cover" />
         <button
@@ -53,7 +53,7 @@ export function DishCard({ dish }: { dish: Dish }) {
           onClick={toggleSaved}
           aria-label={saved ? `Remove ${dish.name} from wishlist` : `Save ${dish.name}`}
           className={`absolute top-3 right-3 h-9 w-9 rounded-full flex items-center justify-center shadow-sm ${
-            saved ? "bg-terra text-white" : "bg-white/90 text-ink"
+            saved ? "bg-terra text-ink" : "bg-white/90 text-ink"
           }`}
         >
           <Heart className={`w-4 h-4 ${saved ? "fill-current" : ""}`} />
@@ -74,8 +74,8 @@ export function DishCard({ dish }: { dish: Dish }) {
           <button
             type="button"
             onClick={handleAdd}
-            className={`inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-bold text-white ${
-              added ? "bg-sage" : "bg-terra hover:bg-terra-deep"
+            className={`inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-bold ${
+              added ? "bg-sage text-cream" : "bg-terra hover:bg-terra-deep text-ink"
             }`}
           >
             {added ? <Check className="w-4 h-4" /> : <Plus className="w-4 h-4" />}

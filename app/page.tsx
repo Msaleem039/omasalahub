@@ -40,7 +40,7 @@ export default function Home() {
             { icon: ShieldCheck, title: t("House sauce", "Sauce maison"), text: t("Pizzas use sauce faite maison", "Pizzas à la sauce faite maison") },
             { icon: Clock, title: t("Open daily", "Ouvert tous les jours"), text: t("Kitchen hours 11:00 to 23:00", "Cuisine ouverte de 11:00 à 23:00") },
           ].map((item) => (
-            <div key={item.title} className="flex items-center gap-4 rounded-3xl bg-card/80 border border-[#c9b79c] p-4">
+            <div key={item.title} className="flex items-center gap-4 rounded-3xl bg-card/80 border border-[#e5dcc8] p-4">
               <div className="bg-sage-soft text-sage p-3 rounded-2xl">
                 <item.icon className="w-5 h-5" />
               </div>
@@ -55,7 +55,7 @@ export default function Home() {
 
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 w-full">
         <div className="text-center mb-8">
-          <h2 className="script-title text-6xl text-ink">Spécialités</h2>
+          <h2 className="script-title text-6xl">Spécialités</h2>
           <p className="text-muted mt-2">{t("Served with basmati rice.", "Servis avec du riz basmati.")}</p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -67,7 +67,7 @@ export default function Home() {
 
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-14 w-full">
         <div className="text-center mb-8">
-          <h2 className="script-title text-6xl text-ink">Biryani & Naan</h2>
+          <h2 className="script-title text-6xl">Biryani & Naan</h2>
           <p className="text-muted mt-2">{t("From the pot and the tandoor.", "Du faitout et du tandoor.")}</p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -86,7 +86,7 @@ export default function Home() {
         <h2 className="font-serif text-4xl text-center mb-8">{t("Browse by course", "Parcourir par catégorie")}</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
           {categories.map((category) => (
-            <Link key={category.slug} href={`/menu/${category.slug}`} className="group bg-card rounded-3xl border border-[#c9b79c] p-4 text-center">
+            <Link key={category.slug} href={`/menu/${category.slug}`} className="group bg-card rounded-3xl border border-[#e5dcc8] p-4 text-center">
               <div className="relative mx-auto h-28 w-28 rounded-full overflow-hidden">
                 <Image src={category.image} alt={category.name} fill unoptimized className="object-cover group-hover:scale-105 transition" />
               </div>
@@ -104,7 +104,7 @@ export default function Home() {
             { quote: "Butter Chicken with basmati rice is now our Friday order.", name: "Hassan Raza" },
             { quote: "Cheese naan and mango lassi made the whole table happy.", name: "Sara Malik" },
           ].map((item) => (
-            <blockquote key={item.name} className="bg-card rounded-3xl border border-[#c9b79c] p-6">
+            <blockquote key={item.name} className="bg-card rounded-3xl border border-[#e5dcc8] p-6">
               <p className="text-ink leading-relaxed">“{item.quote}”</p>
               <footer className="mt-4 text-sm font-bold text-sage">{item.name}</footer>
             </blockquote>

@@ -36,7 +36,7 @@ export default function MenuPage() {
     <SiteShell>
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full">
         <div className="text-center mb-8">
-          <h1 className="script-title text-7xl text-ink">{t("The Menu", "La carte")}</h1>
+          <h1 className="script-title text-7xl">{t("The Menu", "La carte")}</h1>
           <p className="text-muted mt-2">{t("Specialties with basmati rice. Pizzas with sauce faite maison.", "Spécialités avec riz basmati. Pizzas à la sauce faite maison.")}</p>
         </div>
 
@@ -57,7 +57,7 @@ export default function MenuPage() {
               type="button"
               onClick={() => setSelectedCat(category.slug)}
               className={`px-4 py-2 rounded-full text-sm font-bold ${
-                selectedCat === category.slug ? "bg-terra text-white" : "bg-card text-ink border border-[#c9b79c]"
+                selectedCat === category.slug ? "bg-terra text-ink" : "bg-card text-ink border border-[#e5dcc8]"
               }`}
             >
               {categoryLabel(category.slug, lang)}
@@ -66,7 +66,7 @@ export default function MenuPage() {
         </div>
 
         {filtered.length === 0 ? (
-          <div className="text-center bg-card rounded-3xl border border-dashed border-[#c9b79c] py-16">
+          <div className="text-center bg-card rounded-3xl border border-dashed border-[#e5dcc8] py-16">
             <UtensilsCrossed className="w-10 h-10 mx-auto text-sage mb-3" />
             <p className="font-semibold">{t("No dishes match that search.", "Aucun plat ne correspond à cette recherche.")}</p>
           </div>
