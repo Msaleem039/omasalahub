@@ -56,9 +56,13 @@ export default function TrackOrderPage() {
               </div>
               <p className="font-bold">{formatPrice(result.total)}</p>
             </div>
-            {orderStatus(result) === "cancelled" ? (
-              <p className="mb-6 font-bold text-terra-deep">This order was cancelled.</p>
-            ) : (
+            {(() => {
+              const status = orderStatus(result);
+              if (status === "cancelled") {
+                return <p className="mb-6 font-bold text-terra-deep">This order was cancelled.</p>;
+              }
+              const rank = { confirmed: 0, preparing: 1, on_the_way: 2, delivered: 3 }[status];
+              return (
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center mb-6">
                 {[
                   { icon: CheckCircle, label: "Confirmed" },
@@ -66,7 +70,6 @@ export default function TrackOrderPage() {
                   { icon: Bike, label: "On the way" },
                   { icon: Home, label: "Delivered" },
                 ].map((step, index) => {
-                  const rank = { confirmed: 0, preparing: 1, on_the_way: 2, delivered: 3 }[orderStatus(result)];
                   const active = rank >= index;
                   return (
                     <div key={step.label} className={active ? "" : "opacity-40"}>
@@ -78,7 +81,8 @@ export default function TrackOrderPage() {
                   );
                 })}
               </div>
-            )}
+              );
+            })()}
             <ul className="text-sm space-y-2">
               {result.items.map((item) => (
                 <li key={item.id} className="flex justify-between">
