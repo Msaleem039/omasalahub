@@ -14,7 +14,7 @@ const LINKS = [
   { href: "/menu", en: "Menu", fr: "Menu" },
   { href: "/about", en: "About", fr: "À propos" },
   { href: "/contact", en: "Contact", fr: "Contact" },
-  { href: "/track-order", en: "Track", fr: "Suivi" },
+  // { href: "/track-order", en: "Track", fr: "Suivi" },
 ];
 
 export const Navbar: React.FC = () => {
@@ -35,7 +35,7 @@ export const Navbar: React.FC = () => {
       <header className="sticky top-0 z-50 bg-forest text-cream shadow-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between min-h-[4.5rem] gap-4 py-2">
-            <Link href="/" className="leading-none" aria-label="Masala Hub home">
+            <Link href="/" className="leading-none" aria-label="Omasalahub home">
               <Logo />
             </Link>
 

@@ -2,30 +2,41 @@
 
 import React from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { ArrowRight, Clock, Leaf, ShieldCheck, Truck } from "lucide-react";
+import { DishImage } from "./components/DishImage";
 import { Navbar } from "./components/Navbar";
 import { Hero } from "./components/Hero";
 import { Footer } from "./components/Footer";
 import { DishCard } from "./components/DishCard";
-import { DISHES, categoryLabel } from "./data/menuData";
+import { categoryLabel, type Dish } from "./data/menuData";
+import { useCatalog } from "./context/CatalogContext";
 import { useLanguage } from "./context/LanguageContext";
 
-const featured = ["sp-1", "sp-3", "sp-6"].map((id) => DISHES.find((dish) => dish.id === id)!);
-const fromTandoor = ["by-1", "by-2", "na-1"].map((id) => DISHES.find((dish) => dish.id === id)!);
-
-const categories = [
-  { slug: "specialites", name: "Spécialités", image: DISHES[0].image },
-  { slug: "biryanis", name: "Biryanis", image: DISHES.find((d) => d.id === "by-1")!.image },
-  { slug: "naans", name: "Naans", image: DISHES.find((d) => d.id === "na-3")!.image },
-  { slug: "pizzas", name: "Pizzas", image: DISHES.find((d) => d.id === "pz-1")!.image },
-  { slug: "entrees", name: "Entrées", image: DISHES.find((d) => d.id === "en-1")!.image },
-  { slug: "formules", name: "Formules", image: DISHES.find((d) => d.id === "fo-1")!.image },
-  { slug: "boissons", name: "Lassis", image: DISHES.find((d) => d.id === "bo-1")!.image },
+const FEATURED_IDS = ["sp-1", "sp-3", "sp-6"];
+const TANDOOR_IDS = ["by-1", "by-2", "na-1"];
+const COURSE_IDS = [
+  { slug: "specialites", id: "sp-1" },
+  { slug: "biryanis", id: "by-1" },
+  { slug: "naans", id: "na-3" },
+  { slug: "pizzas", id: "pz-1" },
+  { slug: "entrees", id: "en-1" },
+  { slug: "formules", id: "fo-1" },
+  { slug: "boissons", id: "bo-1" },
 ];
+
+function pick(dishes: Dish[], ids: string[]) {
+  return ids.map((id) => dishes.find((dish) => dish.id === id)).filter((dish): dish is Dish => Boolean(dish));
+}
 
 export default function Home() {
   const { t, lang } = useLanguage();
+  const { dishes } = useCatalog();
+  const featured = pick(dishes, FEATURED_IDS);
+  const fromTandoor = pick(dishes, TANDOOR_IDS);
+  const categories = COURSE_IDS.map((course) => {
+    const dish = dishes.find((item) => item.id === course.id) ?? dishes.find((item) => item.category === course.slug);
+    return dish ? { slug: course.slug, image: dish.image, name: dish.name } : null;
+  }).filter((course): course is { slug: string; image: string; name: string } => Boolean(course));
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -88,7 +99,7 @@ export default function Home() {
           {categories.map((category) => (
             <Link key={category.slug} href={`/menu/${category.slug}`} className="group bg-card rounded-3xl border border-[#e5dcc8] p-4 text-center">
               <div className="relative mx-auto h-28 w-28 rounded-full overflow-hidden">
-                <Image src={category.image} alt={category.name} fill unoptimized className="object-cover group-hover:scale-105 transition" />
+                <DishImage src={category.image} alt={category.name} className="object-cover group-hover:scale-105 transition" />
               </div>
               <h3 className="mt-3 font-serif text-2xl">{categoryLabel(category.slug, lang)}</h3>
             </Link>

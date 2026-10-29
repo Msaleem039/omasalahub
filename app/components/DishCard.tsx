@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import Image from "next/image";
 import { Check, Heart, Plus, Star } from "lucide-react";
+import { DishImage } from "./DishImage";
 import type { Dish } from "../data/menuData";
 import { formatPrice } from "../lib/pricing";
 import { useCart } from "../context/CartContext";
@@ -47,7 +47,7 @@ export function DishCard({ dish }: { dish: Dish }) {
   return (
     <article className="bg-card rounded-[1.6rem] border border-[#e5dcc8] shadow-[0_12px_30px_rgba(20,53,40,0.06)] p-3 flex flex-col">
       <div className="relative h-52 rounded-[1.25rem] overflow-hidden bg-cream-deep">
-        <Image src={dish.image} alt={dish.name} fill unoptimized className="object-cover" />
+        <DishImage src={dish.image} alt={dish.name} />
         <button
           type="button"
           onClick={toggleSaved}

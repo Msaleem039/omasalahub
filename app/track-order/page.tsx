@@ -35,14 +35,14 @@ export default function TrackOrderPage() {
     <SiteShell>
       <main className="max-w-3xl mx-auto px-4 py-12">
         <h1 className="script-title text-6xl text-center mb-6">Track an order</h1>
-        <form onSubmit={search} className="bg-card rounded-3xl border border-[#e5dcc8] p-4 flex gap-3">
+        <form onSubmit={search} className="bg-card rounded-3xl border border-[#e5dcc8] p-4 flex flex-col sm:flex-row gap-3">
           <input
             value={orderId}
             onChange={(e) => setOrderId(e.target.value)}
             placeholder="Order ID, for example OM-482193"
-            className="field"
+            className="field min-w-0"
           />
-          <button type="submit" className="bg-terra text-ink font-bold px-5 rounded-full">Search</button>
+          <button type="submit" className="bg-terra text-ink font-bold px-5 py-3 sm:py-0 rounded-full">Search</button>
         </form>
 
         {miss && <p className="mt-4 text-sm text-terra-deep">No order matches {orderId.trim() || "that id"} on this device.</p>}

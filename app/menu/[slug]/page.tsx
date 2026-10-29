@@ -5,13 +5,15 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { SiteShell } from "../../components/SiteShell";
 import { DishCard } from "../../components/DishCard";
-import { categoryLabel, dishesByCategory } from "../../data/menuData";
+import { categoryLabel } from "../../data/menuData";
+import { useCatalog } from "../../context/CatalogContext";
 import { useLanguage } from "../../context/LanguageContext";
 
 export default function CategoryMenuPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params);
   const { t, lang } = useLanguage();
-  const dishes = dishesByCategory(slug);
+  const { dishes: products } = useCatalog();
+  const dishes = slug === "all" ? products : products.filter((dish) => dish.category === slug);
   const title = categoryLabel(slug, lang);
 
   return (

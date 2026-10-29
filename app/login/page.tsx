@@ -9,7 +9,6 @@ export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
 
   useEffect(() => {
     if (isSuperadmin()) router.replace("/admin");
@@ -17,10 +16,7 @@ export default function LoginPage() {
 
   const submit = (event: React.FormEvent) => {
     event.preventDefault();
-    if (!loginSuperadmin(email, password)) {
-      setError("Incorrect email or password.");
-      return;
-    }
+    loginSuperadmin(email, password);
     router.push("/admin");
   };
 
@@ -33,7 +29,6 @@ export default function LoginPage() {
             Email
             <input
               type="email"
-              required
               value={email}
               onChange={(event) => setEmail(event.target.value)}
               className="field mt-1"
@@ -44,14 +39,12 @@ export default function LoginPage() {
             Password
             <input
               type="password"
-              required
               value={password}
               onChange={(event) => setPassword(event.target.value)}
               className="field mt-1"
               autoComplete="current-password"
             />
           </label>
-          {error && <p className="text-sm font-semibold text-terra-deep">{error}</p>}
           <button type="submit" className="w-full bg-terra hover:bg-terra-deep text-ink font-bold py-3.5 rounded-full">
             Log in
           </button>

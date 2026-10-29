@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import Image from "next/image";
+import { DishImage } from "../components/DishImage";
 import { Minus, Plus, Trash2 } from "lucide-react";
 import { SiteShell } from "../components/SiteShell";
 import { useCart } from "../context/CartContext";
@@ -35,7 +35,7 @@ export default function CartPage() {
                 return (
                   <div key={item.id} className="bg-card rounded-3xl border border-[#e5dcc8] p-4 flex items-center gap-4">
                     <div className="relative w-20 h-20 rounded-2xl overflow-hidden shrink-0">
-                      <Image src={item.image} alt={item.name} fill unoptimized className="object-cover" />
+                      <DishImage src={item.image} alt={item.name} />
                     </div>
                     <div className="flex-1 min-w-0">
                       <h2 className="font-serif text-2xl leading-none truncate">{item.name}</h2>

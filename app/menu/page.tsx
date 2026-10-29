@@ -4,11 +4,13 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Search, UtensilsCrossed } from "lucide-react";
 import { SiteShell } from "../components/SiteShell";
 import { DishCard } from "../components/DishCard";
-import { CATEGORIES, DISHES, categoryLabel, type MenuCategory } from "../data/menuData";
+import { CATEGORIES, categoryLabel, type MenuCategory } from "../data/menuData";
+import { useCatalog } from "../context/CatalogContext";
 import { useLanguage } from "../context/LanguageContext";
 
 export default function MenuPage() {
   const { t, lang } = useLanguage();
+  const { dishes: products } = useCatalog();
   const [selectedCat, setSelectedCat] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -19,7 +21,7 @@ export default function MenuPage() {
 
   const filtered = useMemo(() => {
     const q = searchQuery.toLowerCase().trim();
-    return DISHES.filter((dish) => {
+    return products.filter((dish) => {
       const matchesCategory = selectedCat === "all" || dish.category === selectedCat;
       const matchesSearch =
         q === "" ||
@@ -28,7 +30,7 @@ export default function MenuPage() {
         dish.category.includes(q);
       return matchesCategory && matchesSearch;
     });
-  }, [selectedCat, searchQuery]);
+  }, [products, selectedCat, searchQuery]);
 
   const grouped = selectedCat === "all" && searchQuery.trim() === "";
 
@@ -73,7 +75,8 @@ export default function MenuPage() {
         ) : grouped ? (
           <div className="space-y-12">
             {CATEGORIES.filter((category) => category.slug !== "all").map((category) => {
-              const dishes = DISHES.filter((dish) => dish.category === category.slug);
+              const dishes = products.filter((dish) => dish.category === category.slug);
+              if (dishes.length === 0) return null;
               return (
                 <section key={category.slug}>
                   <h2 className="script-title text-5xl mb-5">{categoryLabel(category.slug, lang)}</h2>

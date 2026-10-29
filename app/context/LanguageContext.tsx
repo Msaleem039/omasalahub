@@ -9,31 +9,20 @@ interface LanguageContextType {
   setLang: (lang: Language) => void;
   t: (enText: string, frText: string) => string;
   ready: boolean;
-  showPrompt: boolean;
-  always: boolean;
-  setAlways: (value: boolean) => void;
-  dismissPrompt: () => void;
 }
 
 const LANG_KEY = "omasalahub_lang";
-const ALWAYS_KEY = "omasalahub_lang_always";
-const DISMISS_KEY = "omasalahub_lang_dismissed";
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [lang, setLangState] = useState<Language>("en");
+  const [lang, setLangState] = useState<Language>("fr");
   const [ready, setReady] = useState(false);
-  const [showPrompt, setShowPrompt] = useState(false);
-  const [always, setAlwaysState] = useState(false);
 
   useEffect(() => {
     const saved = localStorage.getItem(LANG_KEY);
-    const savedAlways = localStorage.getItem(ALWAYS_KEY) === "1";
-    const dismissed = sessionStorage.getItem(DISMISS_KEY) === "1";
     if (saved === "fr" || saved === "en") setLangState(saved);
-    setAlwaysState(savedAlways);
-    setShowPrompt(!savedAlways && !dismissed);
+    else setLangState("fr");
     setReady(true);
   }, []);
 
@@ -47,26 +36,10 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     localStorage.setItem(LANG_KEY, next);
   };
 
-  const setAlways = (value: boolean) => {
-    setAlwaysState(value);
-    if (value) {
-      localStorage.setItem(ALWAYS_KEY, "1");
-      localStorage.setItem(LANG_KEY, lang);
-      setShowPrompt(false);
-      return;
-    }
-    localStorage.removeItem(ALWAYS_KEY);
-  };
-
-  const dismissPrompt = () => {
-    sessionStorage.setItem(DISMISS_KEY, "1");
-    setShowPrompt(false);
-  };
-
   const t = (enText: string, frText: string) => (lang === "fr" ? frText : enText);
 
   return (
-    <LanguageContext.Provider value={{ lang, setLang, t, ready, showPrompt, always, setAlways, dismissPrompt }}>
+    <LanguageContext.Provider value={{ lang, setLang, t, ready }}>
       {children}
     </LanguageContext.Provider>
   );
@@ -76,14 +49,10 @@ export const useLanguage = () => {
   const context = useContext(LanguageContext);
   if (!context) {
     return {
-      lang: "en" as Language,
+      lang: "fr" as Language,
       setLang: () => {},
-      t: (enText: string) => enText,
+      t: (_enText: string, frText: string) => frText,
       ready: false,
-      showPrompt: false,
-      always: false,
-      setAlways: () => {},
-      dismissPrompt: () => {},
     };
   }
   return context;

@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { Cormorant_Garamond, Great_Vibes, Nunito } from "next/font/google";
 import "./globals.css";
 import { LanguageProvider } from "./context/LanguageContext";
+import { CatalogProvider } from "./context/CatalogContext";
 import { CartProvider } from "./context/CartContext";
 import { WishlistProvider } from "./context/WishlistContext";
-import { TranslatePrompt } from "./components/TranslatePrompt";
 
 const nunito = Nunito({
   subsets: ["latin"],
@@ -34,15 +34,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="fr">
       <body className={`${nunito.variable} ${cormorant.variable} ${script.variable} antialiased`}>
         <LanguageProvider>
-          <CartProvider>
-            <WishlistProvider>
-              <TranslatePrompt />
-              {children}
-            </WishlistProvider>
-          </CartProvider>
+          <CatalogProvider>
+            <CartProvider>
+              <WishlistProvider>
+                {children}
+              </WishlistProvider>
+            </CartProvider>
+          </CatalogProvider>
         </LanguageProvider>
       </body>
     </html>

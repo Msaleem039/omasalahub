@@ -1,19 +1,16 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
+import { DishImage } from "./DishImage";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { DISHES, type Dish } from "../data/menuData";
+import { type Dish } from "../data/menuData";
 import { formatPrice } from "../lib/pricing";
+import { useCatalog } from "../context/CatalogContext";
 import { useLanguage } from "../context/LanguageContext";
 
 const HERO_IDS = ["by-1", "sp-1", "na-3", "pz-2", "en-1", "bo-1"];
-
-const HERO_DISHES: Dish[] = HERO_IDS.map((id) => DISHES.find((dish) => dish.id === id)).filter(
-  (dish): dish is Dish => Boolean(dish)
-);
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -34,12 +31,15 @@ function placement(index: number, active: number, count: number) {
 
 export const Hero: React.FC = () => {
   const { t } = useLanguage();
+  const { dishes } = useCatalog();
+  const heroDishes = HERO_IDS.map((id) => dishes.find((dish) => dish.id === id)).filter((dish): dish is Dish => Boolean(dish));
+  const slides = heroDishes.length > 0 ? heroDishes : dishes.slice(0, 6);
   const [active, setActive] = useState(0);
   const [paused, setPaused] = useState(false);
   const [reduced, setReduced] = useState(false);
   const [hidden, setHidden] = useState(false);
-  const count = HERO_DISHES.length;
-  const dish = HERO_DISHES[active];
+  const count = slides.length;
+  const dish = slides[active];
 
   useEffect(() => {
     const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -63,7 +63,14 @@ export const Hero: React.FC = () => {
     return () => window.clearInterval(timer);
   }, [paused, reduced, hidden, active, count]);
 
-  const go = (step: number) => setActive((current) => (current + step + count) % count);
+  useEffect(() => {
+    if (count > 0 && active >= count) setActive(0);
+  }, [active, count]);
+
+  const go = (step: number) => {
+    if (count < 1) return;
+    setActive((current) => (current + step + count) % count);
+  };
   const duration = reduced ? 0 : 0.75;
 
   return (
@@ -74,7 +81,7 @@ export const Hero: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-16 grid lg:grid-cols-2 gap-8 lg:gap-6 items-center">
         <div className="min-h-[15rem]">
           <p className="text-sm font-semibold tracking-[0.18em] text-terra uppercase">11:00 — 23:00</p>
-          <AnimatePresence mode="wait">
+          {dish && <AnimatePresence mode="wait">
             <motion.div
               key={dish.id}
               initial={reduced ? false : { opacity: 0, y: 10 }}
@@ -86,13 +93,15 @@ export const Hero: React.FC = () => {
               <p className="mt-5 max-w-md text-muted leading-relaxed">{dish.description}</p>
               <p className="mt-4 text-2xl font-extrabold text-terra">{formatPrice(dish.price)}</p>
             </motion.div>
-          </AnimatePresence>
+          </AnimatePresence>}
+          {dish && (
           <Link
             href={`/menu/${dish.category}`}
             className="inline-flex mt-8 bg-terra hover:bg-terra-deep text-ink font-bold px-8 py-3.5 rounded-full shadow-lg shadow-terra/20"
           >
             {t("Order Now", "Commander")}
           </Link>
+          )}
         </div>
 
         <div
@@ -115,7 +124,7 @@ export const Hero: React.FC = () => {
             <div className="absolute inset-[10%] rounded-full bg-sage-soft/70" />
             <div className="pointer-events-none absolute inset-[6%] rounded-full border border-dashed border-terra/35 motion-safe:animate-[spin_48s_linear_infinite]" />
 
-            {HERO_DISHES.map((item, index) => {
+            {slides.map((item, index) => {
               const spot = placement(index, active, count);
               const isActive = index === active;
               return (
@@ -133,15 +142,7 @@ export const Hero: React.FC = () => {
                     isActive ? "border-white cursor-default" : "border-white/90 cursor-pointer"
                   }`}
                 >
-                  <Image
-                    src={item.image}
-                    alt={item.name}
-                    fill
-                    priority={index === 0}
-                    unoptimized
-                    sizes="(max-width: 1024px) 42vw, 280px"
-                    className="object-cover"
-                  />
+                  <DishImage src={item.image} alt={item.name} priority={index === 0} sizes="(max-width: 1024px) 42vw, 280px" />
                 </motion.button>
               );
             })}
@@ -157,7 +158,7 @@ export const Hero: React.FC = () => {
               <ChevronLeft className="h-5 w-5" />
             </button>
             <p className="sr-only" aria-live="polite">
-              {dish.name}, {formatPrice(dish.price)}
+              {dish ? `${dish.name}, ${formatPrice(dish.price)}` : ""}
             </p>
             <button
               type="button"

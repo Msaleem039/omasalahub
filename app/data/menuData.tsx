@@ -246,7 +246,7 @@ const CATEGORY_TEXT: Record<string, { en: string; fr: string }> = {
   boissons: { en: "Lassis & drinks", fr: "Lassis et boissons" },
 };
 
-export function categoryLabel(slug: string, lang: "en" | "fr" = "en") {
+export function categoryLabel(slug: string, lang: "en" | "fr" = "fr") {
   return CATEGORY_TEXT[slug]?.[lang] ?? CATEGORIES.find((category) => category.slug === slug)?.label ?? slug.replace(/-/g, " ");
 }
 

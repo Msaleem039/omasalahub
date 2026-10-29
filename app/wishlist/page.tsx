@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import Image from "next/image";
+import { DishImage } from "../components/DishImage";
 import Link from "next/link";
 import { ShoppingBag, Trash2 } from "lucide-react";
 import { SiteShell } from "../components/SiteShell";
@@ -32,7 +32,7 @@ export default function WishlistPage() {
             {wishlist.map((item) => (
               <article key={item.id} className="bg-card rounded-3xl border border-[#e5dcc8] overflow-hidden">
                 <div className="relative h-44">
-                  <Image src={item.image} alt={item.name} fill unoptimized className="object-cover" />
+                  <DishImage src={item.image} alt={item.name} />
                   <button type="button" onClick={() => removeFromWishlist(item.id)} className="absolute top-3 right-3 bg-white/90 p-2 rounded-full" aria-label={`Remove ${item.name}`}>
                     <Trash2 className="w-4 h-4" />
                   </button>
