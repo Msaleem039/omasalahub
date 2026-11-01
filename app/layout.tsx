@@ -36,8 +36,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fr">
-      <body className={`${nunito.variable} ${cormorant.variable} ${script.variable} antialiased`}>
+    <html lang="fr" suppressHydrationWarning>
+      <body className={`${nunito.variable} ${cormorant.variable} ${script.variable} antialiased`} suppressHydrationWarning>
         <LanguageProvider>
           <AuthProvider>
             <CatalogProvider>

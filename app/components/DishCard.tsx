@@ -51,12 +51,14 @@ export function DishCard({ dish }: { dish: Dish }) {
   return (
     <article className="bg-card rounded-[1.6rem] border border-[#e5dcc8] shadow-[0_12px_30px_rgba(20,53,40,0.06)] p-3 flex flex-col">
       <div className="relative h-52 rounded-[1.25rem] overflow-hidden bg-cream-deep">
-        <DishImage src={dish.image} alt={dish.name} />
+        <Link href={dishPath(dish)} className="absolute inset-0 block">
+          <DishImage src={dish.image} alt={dish.name} />
+        </Link>
         <button
           type="button"
           onClick={toggleSaved}
           aria-label={saved ? t(`Remove ${dish.name} from wishlist`, `Retirer ${dish.name} de la liste`) : t(`Save ${dish.name}`, `Enregistrer ${dish.name}`)}
-          className={`absolute top-3 right-3 h-9 w-9 rounded-full flex items-center justify-center shadow-sm ${
+          className={`absolute top-3 right-3 z-10 h-9 w-9 rounded-full flex items-center justify-center shadow-sm ${
             saved ? "bg-terra text-ink" : "bg-white/90 text-ink"
           }`}
         >
