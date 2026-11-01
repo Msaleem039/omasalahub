@@ -6,7 +6,7 @@ import { Minus, Plus, Star } from "lucide-react";
 import { SiteShell } from "./SiteShell";
 import { DishImage } from "./DishImage";
 import { ProductReviews } from "./ProductReviews";
-import { categoryLabel, dishPath, type Dish } from "../data/menuData";
+import { categoryLabel, dishDescription, dishPath, type Dish } from "../data/menuData";
 import { formatPrice } from "../lib/pricing";
 import { useCart } from "../context/CartContext";
 import { useLanguage } from "../context/LanguageContext";
@@ -87,7 +87,7 @@ export function ProductView({ product, related }: { product: Dish; related: Dish
                 <span className="text-sm text-muted">{t("No reviews yet", "Pas encore d'avis")}</span>
               )}
             </div>
-            <p className="mt-4 leading-relaxed text-muted">{product.description}</p>
+            <p className="mt-4 leading-relaxed text-muted">{dishDescription(product.description, lang)}</p>
             <p className={`mt-4 text-sm font-bold ${orderable ? "text-sage" : "text-terra-deep"}`}>
               {orderable ? t("Available", "Disponible") : t("Unavailable right now", "Indisponible pour le moment")}
             </p>

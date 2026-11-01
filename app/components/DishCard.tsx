@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { Check, Heart, Plus, Star } from "lucide-react";
 import { DishImage } from "./DishImage";
-import { dishPath, type Dish } from "../data/menuData";
+import { dishDescription, dishPath, type Dish } from "../data/menuData";
 import { formatPrice } from "../lib/pricing";
 import { useCart } from "../context/CartContext";
 import { useWishlist } from "../context/WishlistContext";
@@ -12,7 +12,7 @@ import { useLanguage } from "../context/LanguageContext";
 
 export function DishCard({ dish }: { dish: Dish }) {
   const { addToCart } = useCart();
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const [added, setAdded] = useState(false);
   const saved = isInWishlist(dish.id);
@@ -77,7 +77,7 @@ export function DishCard({ dish }: { dish: Dish }) {
             </span>
           ) : null}
         </div>
-        <p className="text-sm text-muted mt-2 leading-relaxed line-clamp-2">{dish.description}</p>
+        <p className="text-sm text-muted mt-2 leading-relaxed line-clamp-2">{dishDescription(dish.description, lang)}</p>
         <div className="mt-4 flex items-center justify-between gap-3">
           <span className="text-lg font-extrabold text-terra">{formatPrice(dish.price)}</span>
           <div className="flex items-center gap-2">

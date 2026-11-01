@@ -278,6 +278,37 @@ export function categoryLabel(slug: string, lang: "en" | "fr" = "fr") {
   return CATEGORY_TEXT[slug]?.[lang] ?? CATEGORIES.find((category) => category.slug === slug)?.label ?? slug.replace(/-/g, " ");
 }
 
+const DESCRIPTION_PAIRS: [string, string][] = [
+  ["Creamy tomato butter chicken, served with basmati rice.", "Poulet au beurre, sauce tomate crémeuse, servi avec du riz basmati."],
+  ["Slow-cooked chicken in a spiced masala gravy, served with basmati rice.", "Poulet mijoté dans une sauce masala épicée, servi avec du riz basmati."],
+  ["Grilled chicken tikka folded into a warm masala sauce, with basmati rice.", "Poulet tikka grillé dans une sauce masala, avec du riz basmati."],
+  ["Chicken balti in a rich pepper sauce, served with basmati rice.", "Poulet balti dans une sauce poivrée, servi avec du riz basmati."],
+  ["Mild shahi korma with cream and warm spices, served with basmati rice.", "Shahi korma doux à la crème et aux épices, servi avec du riz basmati."],
+  ["Tempered yellow lentils finished with ghee and cumin, served with basmati rice.", "Lentilles jaunes au ghee et au cumin, servies avec du riz basmati."],
+  ["Chicken biryani layered with saffron basmati rice and fried onions.", "Biryani de poulet au riz basmati safrané et aux oignons frits."],
+  ["Vegetable biryani with garden vegetables and fragrant basmati rice.", "Biryani de légumes au riz basmati parfumé."],
+  ["Tandoor naan filled with seasoned chicken.", "Naan au tandoor garni de poulet épicé."],
+  ["Stuffed naan with chicken masala and fresh herbs.", "Naan farci au poulet masala et aux herbes fraîches."],
+  ["Soft tandoor naan stuffed with melted cheese.", "Naan moelleux farci au fromage fondu."],
+  ["Chicken pizza with house-made sauce.", "Pizza au poulet, sauce faite maison."],
+  ["Butter chicken pizza with house-made sauce.", "Pizza butter chicken, sauce faite maison."],
+  ["Two crisp pastry samosas with a spiced filling.", "Deux samosas croustillants à la farce épicée."],
+  ["Four vegetable pakoras, fried until golden.", "Quatre pakoras de légumes, dorés à la friture."],
+  ["Chicken + rice + 33 cl drink.", "Poulet + riz + boisson 33 cl."],
+  ["Pizza of your choice + 33 cl drink.", "Pizza au choix + boisson 33 cl."],
+  ["Filled naan + 33 cl drink.", "Naan garni + boisson 33 cl."],
+  ["Chilled mango lassi, blended thick and smooth.", "Lassi mangue bien frais, onctueux et lisse."],
+  ["Rose lassi with a light floral finish.", "Lassi à la rose, au parfum floral léger."],
+  ["Plain yogurt lassi, lightly salted and refreshing.", "Lassi nature, légèrement salé et rafraîchissant."],
+  ["Chilled soft drink, 33 cl.", "Boisson fraîche, 33 cl."],
+];
+
+export function dishDescription(description: string, lang: "en" | "fr") {
+  const pair = DESCRIPTION_PAIRS.find(([en, fr]) => description === en || description === fr);
+  if (!pair) return description;
+  return lang === "fr" ? pair[1] : pair[0];
+}
+
 export function dishesByCategory(slug: string) {
   if (slug === "all") return DISHES;
   return DISHES.filter((dish) => dish.category === slug);

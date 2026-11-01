@@ -4,7 +4,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Search, UtensilsCrossed } from "lucide-react";
 import { SiteShell } from "../components/SiteShell";
 import { DishCard } from "../components/DishCard";
-import { CATEGORIES, categoryLabel, type MenuCategory } from "../data/menuData";
+import { CATEGORIES, categoryLabel, dishDescription, type MenuCategory } from "../data/menuData";
 import { useCatalog } from "../context/CatalogContext";
 import { useLanguage } from "../context/LanguageContext";
 
@@ -27,6 +27,8 @@ export default function MenuPage() {
         q === "" ||
         dish.name.toLowerCase().includes(q) ||
         dish.description.toLowerCase().includes(q) ||
+        dishDescription(dish.description, "fr").toLowerCase().includes(q) ||
+        dishDescription(dish.description, "en").toLowerCase().includes(q) ||
         dish.category.includes(q);
       return matchesCategory && matchesSearch;
     });

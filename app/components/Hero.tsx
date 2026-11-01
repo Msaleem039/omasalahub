@@ -5,7 +5,7 @@ import Link from "next/link";
 import { DishImage } from "./DishImage";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { type Dish } from "../data/menuData";
+import { dishDescription, type Dish } from "../data/menuData";
 import { formatPrice } from "../lib/pricing";
 import { useCatalog } from "../context/CatalogContext";
 import { useLanguage } from "../context/LanguageContext";
@@ -30,7 +30,7 @@ function placement(index: number, active: number, count: number) {
 }
 
 export const Hero: React.FC = () => {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const { dishes, info } = useCatalog();
   const heroDishes = HERO_IDS.map((id) => dishes.find((dish) => dish.id === id)).filter((dish): dish is Dish => Boolean(dish));
   const slides = heroDishes.length > 0 ? heroDishes : dishes.slice(0, 6);
@@ -90,7 +90,7 @@ export const Hero: React.FC = () => {
               transition={{ duration: reduced ? 0 : 0.35 }}
             >
               <h1 className="font-serif text-5xl sm:text-6xl text-ink mt-3 leading-none">{dish.name}</h1>
-              <p className="mt-5 max-w-md text-muted leading-relaxed">{dish.description}</p>
+              <p className="mt-5 max-w-md text-muted leading-relaxed">{dishDescription(dish.description, lang)}</p>
               <p className="mt-4 text-2xl font-extrabold text-terra">{formatPrice(dish.price)}</p>
             </motion.div>
           </AnimatePresence>}
