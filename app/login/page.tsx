@@ -24,7 +24,7 @@ export default function LoginPage() {
     const response = await apiFetch(mode === "login" ? "/api/user/login" : "/api/user/register", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ name, email, password }),
+      body: JSON.stringify(mode === "login" ? { email, password } : { name, email, password }),
     });
     const data = await response.json();
     const role = data.role || data.user?.role;
