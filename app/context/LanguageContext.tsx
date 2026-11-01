@@ -21,9 +21,11 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   useEffect(() => {
     const saved = localStorage.getItem(LANG_KEY);
-    if (saved === "fr" || saved === "en") setLangState(saved);
-    else setLangState("fr");
-    setReady(true);
+    queueMicrotask(() => {
+      if (saved === "fr" || saved === "en") setLangState(saved);
+      else setLangState("fr");
+      setReady(true);
+    });
   }, []);
 
   useEffect(() => {

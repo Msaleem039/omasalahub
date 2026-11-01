@@ -1,122 +1,127 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Bike, CheckCircle, CookingPot, Home } from "lucide-react";
+import { Bike, CheckCircle, CookingPot, Home, Store } from "lucide-react";
 import { SiteShell } from "../components/SiteShell";
+import { useLanguage } from "../context/LanguageContext";
+import { errorText } from "../lib/errors";
 import { formatPrice } from "../lib/pricing";
-import { getOrder, getOrders, orderStatus, paymentLabel, type SavedOrder } from "../lib/orders";
+import { PAYMENT_STATUS_LABEL, STATUS_LABEL } from "../lib/orders";
+import { apiFetch } from "../lib/clientApi";
+import type { PublicOrder } from "../lib/types";
 
 export default function TrackOrderPage() {
+  const { t, lang } = useLanguage();
   const [orderId, setOrderId] = useState("");
-  const [result, setResult] = useState<SavedOrder | null>(null);
-  const [miss, setMiss] = useState(false);
-  const [recent, setRecent] = useState<SavedOrder[]>([]);
+  const [phone, setPhone] = useState("");
+  const [order, setOrder] = useState<PublicOrder | null>(null);
+  const [error, setError] = useState("");
+
+  const lookup = async (id: string, nextPhone: string, token = "") => {
+    setError("");
+    const response = await apiFetch(`/api/order/track/${encodeURIComponent(id)}?phone=${encodeURIComponent(nextPhone)}`, {
+      headers: token ? { "x-order-token": token } : {},
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      setOrder(null);
+      setError(errorText(data.error || "not_found", lang));
+      return;
+    }
+    setOrder(data.order);
+  };
 
   useEffect(() => {
-    const orders = getOrders();
-    setRecent(orders.slice(0, 4));
-    const fromUrl = new URLSearchParams(window.location.search).get("id");
-    if (fromUrl) {
-      setOrderId(fromUrl);
-      const found = getOrder(fromUrl);
-      setResult(found ?? null);
-      setMiss(!found);
-    }
-  }, []);
+    const id = new URLSearchParams(window.location.search).get("id");
+    if (!id) return;
+    const token = sessionStorage.getItem(`mh_order_${id}`) ?? "";
+    queueMicrotask(() => setOrderId(id));
+    if (!token) return;
+    apiFetch(`/api/order/track/${encodeURIComponent(id)}`, { headers: { "x-order-token": token } })
+      .then((response) => response.json().then((data) => ({ ok: response.ok, data })))
+      .then(({ ok, data }) => {
+        if (!ok) {
+          setOrder(null);
+          setError(errorText(data.error || "not_found", lang));
+          return;
+        }
+        setOrder(data.order);
+      })
+      .catch(() => setError(errorText("generic", lang)));
+  }, [lang]);
 
-  const search = (event: React.FormEvent) => {
-    event.preventDefault();
-    const found = getOrder(orderId.trim());
-    setResult(found ?? null);
-    setMiss(!found);
-  };
+  const status = order?.status;
+  const steps = order?.service === "pickup"
+    ? [
+        { key: "confirmed", icon: CheckCircle, label: t("Confirmed", "Confirmée") },
+        { key: "preparing", icon: CookingPot, label: t("Preparing", "En préparation") },
+        { key: "ready", icon: Store, label: t("Ready for pickup", "Prête au retrait") },
+        { key: "completed", icon: Home, label: t("Completed", "Terminée") },
+      ]
+    : [
+        { key: "confirmed", icon: CheckCircle, label: t("Confirmed", "Confirmée") },
+        { key: "preparing", icon: CookingPot, label: t("Preparing", "En préparation") },
+        { key: "on_the_way", icon: Bike, label: t("Out for delivery", "En livraison") },
+        { key: "completed", icon: Home, label: t("Completed", "Terminée") },
+      ];
+  const rank = steps.findIndex((step) => step.key === status);
 
   return (
     <SiteShell>
       <main className="max-w-3xl mx-auto px-4 py-12">
-        <h1 className="script-title text-6xl text-center mb-6">Track an order</h1>
-        <form onSubmit={search} className="bg-card rounded-3xl border border-[#e5dcc8] p-4 flex flex-col sm:flex-row gap-3">
-          <input
-            value={orderId}
-            onChange={(e) => setOrderId(e.target.value)}
-            placeholder="Order ID, for example OM-482193"
-            className="field min-w-0"
-          />
-          <button type="submit" className="bg-terra text-ink font-bold px-5 py-3 sm:py-0 rounded-full">Search</button>
+        <h1 className="script-title text-6xl text-center mb-6">{t("Track an order", "Suivre une commande")}</h1>
+        <form
+          onSubmit={(event) => {
+            event.preventDefault();
+            const token = sessionStorage.getItem(`mh_order_${orderId.trim()}`) ?? "";
+            lookup(orderId.trim(), phone, token);
+          }}
+          className="bg-card rounded-3xl border border-[#e5dcc8] p-4 grid gap-3"
+        >
+          <input value={orderId} onChange={(event) => setOrderId(event.target.value)} placeholder={t("Order reference, for example OM-482193", "Référence, par exemple OM-482193")} className="field" />
+          <input value={phone} onChange={(event) => setPhone(event.target.value)} placeholder={t("Phone on the order", "Téléphone de la commande")} className="field" />
+          <button type="submit" className="bg-terra text-ink font-bold px-5 py-3 rounded-full">{t("Search", "Rechercher")}</button>
         </form>
-
-        {miss && <p className="mt-4 text-sm text-terra-deep">No order matches {orderId.trim() || "that id"} on this device.</p>}
-
-        {result && (
+        <p className="mt-3 text-xs text-muted">{t("There is no live driver map. Status comes from the kitchen.", "Il n'y a pas de suivi GPS du livreur. Le statut vient de la cuisine.")}</p>
+        {error && <p className="mt-4 text-sm text-terra-deep">{error}</p>}
+        {order && (
           <section className="mt-6 bg-card rounded-3xl border border-[#e5dcc8] p-6">
             <div className="flex flex-wrap items-end justify-between gap-3 mb-6">
               <div>
-                <p className="text-xs font-bold tracking-wide text-sage uppercase">{result.id}</p>
-                <h2 className="font-serif text-3xl">{paymentLabel(result.paymentMethod)}</h2>
+                <p className="text-xs font-bold tracking-wide text-sage uppercase">{order.id}</p>
+                <h2 className="font-serif text-3xl">{t(STATUS_LABEL[order.status].en, STATUS_LABEL[order.status].fr)}</h2>
+                <p className="text-sm text-muted">{t(PAYMENT_STATUS_LABEL[order.paymentStatus].en, PAYMENT_STATUS_LABEL[order.paymentStatus].fr)}</p>
               </div>
-              <p className="font-bold">{formatPrice(result.total)}</p>
+              <p className="font-bold">{formatPrice(order.total)}</p>
             </div>
-            {(() => {
-              const status = orderStatus(result);
-              if (status === "cancelled") {
-                return <p className="mb-6 font-bold text-terra-deep">This order was cancelled.</p>;
-              }
-              const rank = { confirmed: 0, preparing: 1, on_the_way: 2, delivered: 3 }[status];
-              return (
+            {order.status === "cancelled" ? (
+              <p className="mb-6 font-bold text-terra-deep">{t("This order was cancelled.", "Cette commande a été annulée.")}</p>
+            ) : order.status === "pending" ? (
+              <p className="mb-6 font-bold">{t("Waiting for the kitchen to confirm.", "En attente de confirmation de la cuisine.")}</p>
+            ) : (
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center mb-6">
-                {[
-                  { icon: CheckCircle, label: "Confirmed" },
-                  { icon: CookingPot, label: "Preparing" },
-                  { icon: Bike, label: "On the way" },
-                  { icon: Home, label: "Delivered" },
-                ].map((step, index) => {
+                {steps.map((step, index) => {
                   const active = rank >= index;
                   return (
-                    <div key={step.label} className={active ? "" : "opacity-40"}>
-                      <div className={`mx-auto mb-2 w-12 h-12 rounded-full flex items-center justify-center ${active ? "bg-sage text-cream" : "bg-cream-deep text-ink"}`}>
-                        <step.icon className="w-5 h-5" />
+                    <div key={step.key} className={active ? "" : "opacity-40"}>
+                      <div className={`mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full ${active ? "bg-sage text-cream" : "bg-cream-deep text-ink"}`}>
+                        <step.icon className="h-5 w-5" />
                       </div>
                       <p className="text-xs font-bold">{step.label}</p>
                     </div>
                   );
                 })}
               </div>
-              );
-            })()}
-            <ul className="text-sm space-y-2">
-              {result.items.map((item) => (
-                <li key={item.id} className="flex justify-between">
-                  <span>{item.quantity} × {item.name}</span>
+            )}
+            <ul className="space-y-2 text-sm">
+              {order.items.map((item) => (
+                <li key={item.id} className="flex justify-between gap-3">
+                  <span>{item.quantity} × {item.name}{item.optionsLabel ? ` (${item.optionsLabel})` : ""}</span>
                   <span>{formatPrice(item.price * item.quantity)}</span>
                 </li>
               ))}
             </ul>
-            <p className="text-sm text-muted mt-4">To {result.customer.address}</p>
           </section>
-        )}
-
-        {recent.length > 0 && (
-          <div className="mt-8">
-            <h2 className="font-serif text-2xl mb-3">Recent on this device</h2>
-            <ul className="space-y-2">
-              {recent.map((order) => (
-                <li key={order.id}>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setOrderId(order.id);
-                      setResult(order);
-                      setMiss(false);
-                    }}
-                    className="w-full text-left bg-card border border-[#e5dcc8] rounded-2xl px-4 py-3 flex justify-between"
-                  >
-                    <span className="font-bold">{order.id}</span>
-                    <span className="text-sm text-muted">{paymentLabel(order.paymentMethod)}</span>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
         )}
       </main>
     </SiteShell>

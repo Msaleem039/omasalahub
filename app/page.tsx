@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, Clock, Leaf, ShieldCheck, Truck } from "lucide-react";
 import { DishImage } from "./components/DishImage";
@@ -8,9 +8,13 @@ import { Navbar } from "./components/Navbar";
 import { Hero } from "./components/Hero";
 import { Footer } from "./components/Footer";
 import { DishCard } from "./components/DishCard";
+import { OrderingBanner } from "./components/OrderingBanner";
 import { categoryLabel, type Dish } from "./data/menuData";
 import { useCatalog } from "./context/CatalogContext";
 import { useLanguage } from "./context/LanguageContext";
+import { apiFetch } from "./lib/clientApi";
+import { formatPrice } from "./lib/pricing";
+import type { PublicReview } from "./lib/types";
 
 const FEATURED_IDS = ["sp-1", "sp-3", "sp-6"];
 const TANDOOR_IDS = ["by-1", "by-2", "na-1"];
@@ -30,7 +34,15 @@ function pick(dishes: Dish[], ids: string[]) {
 
 export default function Home() {
   const { t, lang } = useLanguage();
-  const { dishes } = useCatalog();
+  const { dishes, info } = useCatalog();
+  const [reviews, setReviews] = useState<PublicReview[]>([]);
+
+  useEffect(() => {
+    apiFetch("/api/food/reviews?pageSize=3")
+      .then((response) => response.json())
+      .then((data) => setReviews(Array.isArray(data.reviews) ? data.reviews : []))
+      .catch(() => setReviews([]));
+  }, []);
   const featured = pick(dishes, FEATURED_IDS);
   const fromTandoor = pick(dishes, TANDOOR_IDS);
   const categories = COURSE_IDS.map((course) => {
@@ -41,15 +53,16 @@ export default function Home() {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
+      <OrderingBanner />
       <Hero />
 
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-4 w-full">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {[
-            { icon: Truck, title: t("Hot delivery", "Livraison chaude"), text: t("Free delivery on orders from €25", "Livraison offerte dès 25 €") },
+            { icon: Truck, title: t("Hot delivery", "Livraison chaude"), text: info ? t(`Free delivery from ${formatPrice(info.freeDeliveryFrom)}`, `Livraison offerte dès ${formatPrice(info.freeDeliveryFrom)}`) : t("Delivery fee shown at checkout", "Frais de livraison indiqués à la commande") },
             { icon: Leaf, title: t("Basmati rice", "Riz basmati"), text: t("Specialties arrive with steamed rice", "Les spécialités sont servies avec du riz") },
             { icon: ShieldCheck, title: t("House sauce", "Sauce maison"), text: t("Pizzas use sauce faite maison", "Pizzas à la sauce faite maison") },
-            { icon: Clock, title: t("Open daily", "Ouvert tous les jours"), text: t("Kitchen hours 11:00 to 23:00", "Cuisine ouverte de 11:00 à 23:00") },
+            { icon: Clock, title: info?.openNow ? t("Kitchen open", "Cuisine ouverte") : t("Kitchen hours", "Horaires"), text: info?.hoursShort || t("Hours follow the restaurant schedule", "Horaires selon le planning du restaurant") },
           ].map((item) => (
             <div key={item.title} className="flex items-center gap-4 rounded-3xl bg-card/80 border border-[#e5dcc8] p-4">
               <div className="bg-sage-soft text-sage p-3 rounded-2xl">
@@ -108,19 +121,19 @@ export default function Home() {
       </section>
 
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 w-full">
-        <h2 className="script-title text-6xl text-center mb-8">{t("Kind words", "Ils en parlent")}</h2>
-        <div className="grid md:grid-cols-3 gap-5">
-          {[
-            { quote: "The Biryani Poulet arrived steaming, with the rice still fragrant.", name: "Ayesha Khan" },
-            { quote: "Butter Chicken with basmati rice is now our Friday order.", name: "Hassan Raza" },
-            { quote: "Cheese naan and mango lassi made the whole table happy.", name: "Sara Malik" },
-          ].map((item) => (
-            <blockquote key={item.name} className="bg-card rounded-3xl border border-[#e5dcc8] p-6">
-              <p className="text-ink leading-relaxed">“{item.quote}”</p>
-              <footer className="mt-4 text-sm font-bold text-sage">{item.name}</footer>
-            </blockquote>
-          ))}
-        </div>
+        <h2 className="script-title text-6xl text-center mb-8">{t("Verified reviews", "Avis vérifiés")}</h2>
+        {reviews.length === 0 ? (
+          <p className="text-center text-muted">{t("Approved reviews from completed orders will appear here.", "Les avis approuvés, issus de commandes terminées, apparaîtront ici.")}</p>
+        ) : (
+          <div className="grid md:grid-cols-3 gap-5">
+            {reviews.map((review) => (
+              <blockquote key={review.id} className="bg-card rounded-3xl border border-[#e5dcc8] p-6">
+                <p className="text-ink leading-relaxed">“{review.body}”</p>
+                <footer className="mt-4 text-sm font-bold text-sage">{review.author} · {review.productName} · {review.rating}/5</footer>
+              </blockquote>
+            ))}
+          </div>
+        )}
       </section>
 
       <Footer />

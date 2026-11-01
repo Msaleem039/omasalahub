@@ -4,14 +4,16 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { Clock, Mail, MapPin, Phone } from "lucide-react";
 import { useLanguage } from "@/app/context/LanguageContext";
+import { useCatalog } from "../context/CatalogContext";
 import { Logo } from "./Logo";
 
 export const Footer = () => {
   const { t = (en: string) => en } = useLanguage() || {};
+  const { info } = useCatalog();
   const [year, setYear] = useState<number | null>(null);
 
   useEffect(() => {
-    setYear(new Date().getFullYear());
+    queueMicrotask(() => setYear(new Date().getFullYear()));
   }, []);
 
   return (
@@ -34,6 +36,7 @@ export const Footer = () => {
             <li><Link href="/menu" className="hover:text-terra">{t("Full menu", "Menu complet")}</Link></li>
             <li><Link href="/about" className="hover:text-terra">{t("About", "À propos")}</Link></li>
             <li><Link href="/track-order" className="hover:text-terra">{t("Track order", "Suivre une commande")}</Link></li>
+            <li><Link href="/orders" className="hover:text-terra">{t("Order history", "Historique")}</Link></li>
             <li><Link href="/checkout" className="hover:text-terra">{t("Checkout", "Commander")}</Link></li>
           </ul>
         </div>
@@ -55,7 +58,7 @@ export const Footer = () => {
             <li className="flex gap-2"><MapPin className="w-4 h-4 text-terra shrink-0 mt-0.5" /> Main Boulevard, Gulberg III, Lahore</li>
             <li className="flex gap-2"><Phone className="w-4 h-4 text-terra shrink-0" /> +92 42 111 228 325</li>
             <li className="flex gap-2"><Mail className="w-4 h-4 text-terra shrink-0" /> support@masalahub.com</li>
-            <li className="flex gap-2"><Clock className="w-4 h-4 text-terra shrink-0" /> {t("Open daily, 11:00–23:00", "Ouvert tous les jours, 11:00–23:00")}</li>
+            <li className="flex gap-2"><Clock className="w-4 h-4 text-terra shrink-0" /> {info?.hoursShort ? `${info.openNow ? t("Open", "Ouvert") : t("Closed", "Fermé")} · ${info.hoursShort}` : t("Kitchen hours", "Horaires")}</li>
           </ul>
         </div>
       </div>

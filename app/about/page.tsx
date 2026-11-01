@@ -5,8 +5,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { Clock, Leaf, ShieldCheck } from "lucide-react";
 import { SiteShell } from "../components/SiteShell";
+import { useCatalog } from "../context/CatalogContext";
+import { useLanguage } from "../context/LanguageContext";
 
 export default function AboutPage() {
+  const { info } = useCatalog();
+  const { t } = useLanguage();
   return (
     <SiteShell>
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 space-y-16">
@@ -20,7 +24,7 @@ export default function AboutPage() {
             <div className="grid grid-cols-3 gap-4 mt-8 border-t border-[#e5dcc8] pt-6">
               <div><p className="font-serif text-4xl text-terra">30m</p><p className="text-xs text-muted">Typical delivery</p></div>
               <div><p className="font-serif text-4xl text-terra">22</p><p className="text-xs text-muted">Dishes on the card</p></div>
-              <div><p className="font-serif text-4xl text-terra">11–23</p><p className="text-xs text-muted">Kitchen hours</p></div>
+              <div><p className="font-serif text-4xl text-terra">{info?.hoursShort ? info.hoursShort.replace(" — ", "–") : "—"}</p><p className="text-xs text-muted">{t("Kitchen hours", "Horaires")}</p></div>
             </div>
           </div>
           <div className="relative h-80 sm:h-[420px] rounded-[2rem] overflow-hidden border-4 border-white shadow-xl">
@@ -37,7 +41,7 @@ export default function AboutPage() {
         <section className="grid md:grid-cols-3 gap-5">
           {[
             { icon: Leaf, title: "Rice with every specialty", text: "Butter chicken, masala, tikka, balti, korma, and dal tadka come with basmati rice." },
-            { icon: Clock, title: "A clear kitchen clock", text: "We cook between 11:00 and 23:00, so the tandoor and the biryani pot stay in rhythm." },
+            { icon: Clock, title: t("A clear kitchen clock", "Un horaire clair"), text: info?.hoursShort ? t(`The kitchen follows ${info.hoursShort} (${info.timezone}).`, `La cuisine suit ${info.hoursShort} (${info.timezone}).`) : t("Hours follow the restaurant schedule.", "Les horaires suivent le planning du restaurant.") },
             { icon: ShieldCheck, title: "A tidy pass", text: "Each box is sealed, labeled, and checked before it leaves the counter." },
           ].map((item) => (
             <div key={item.title} className="bg-card rounded-3xl border border-[#e5dcc8] p-6">

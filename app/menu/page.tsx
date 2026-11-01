@@ -16,7 +16,7 @@ export default function MenuPage() {
 
   useEffect(() => {
     const query = new URLSearchParams(window.location.search).get("search");
-    if (query) setSearchQuery(query);
+    if (query) queueMicrotask(() => setSearchQuery(query));
   }, []);
 
   const filtered = useMemo(() => {

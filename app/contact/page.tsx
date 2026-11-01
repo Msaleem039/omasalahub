@@ -3,9 +3,13 @@
 import React, { useState } from "react";
 import { Mail, MapPin, Phone } from "lucide-react";
 import { SiteShell } from "../components/SiteShell";
+import { useCatalog } from "../context/CatalogContext";
+import { useLanguage } from "../context/LanguageContext";
 
 export default function ContactPage() {
   const [sent, setSent] = useState(false);
+  const { info } = useCatalog();
+  const { t } = useLanguage();
 
   return (
     <SiteShell>
@@ -34,7 +38,7 @@ export default function ContactPage() {
           <div className="bg-card rounded-3xl border border-[#e5dcc8] p-8 flex items-center">
             <div>
               <h2 className="font-serif text-4xl">Message received</h2>
-              <p className="text-muted mt-2">We will reply during kitchen hours, 11:00 to 23:00.</p>
+              <p className="text-muted mt-2">{t("We reply during the published kitchen hours.", "Nous répondons pendant les horaires affichés.")} {info?.hoursShort}</p>
               <button type="button" onClick={() => setSent(false)} className="mt-6 text-terra font-bold">Send another</button>
             </div>
           </div>

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Cormorant_Garamond, Great_Vibes, Nunito } from "next/font/google";
 import "./globals.css";
 import { LanguageProvider } from "./context/LanguageContext";
+import { AuthProvider } from "./context/AuthContext";
 import { CatalogProvider } from "./context/CatalogContext";
 import { CartProvider } from "./context/CartContext";
 import { WishlistProvider } from "./context/WishlistContext";
@@ -24,8 +25,9 @@ const script = Great_Vibes({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"),
   title: "Masala Hub - Biryani, Curries & Naans",
-  description: "Order butter chicken, biryani, naan, and house specialties from Masala Hub.",
+  description: "Commandez butter chicken, biryani, naan et spécialités maison chez Masala Hub.",
 };
 
 export default function RootLayout({
@@ -37,13 +39,15 @@ export default function RootLayout({
     <html lang="fr">
       <body className={`${nunito.variable} ${cormorant.variable} ${script.variable} antialiased`}>
         <LanguageProvider>
-          <CatalogProvider>
-            <CartProvider>
-              <WishlistProvider>
-                {children}
-              </WishlistProvider>
-            </CartProvider>
-          </CatalogProvider>
+          <AuthProvider>
+            <CatalogProvider>
+              <CartProvider>
+                <WishlistProvider>
+                  {children}
+                </WishlistProvider>
+              </CartProvider>
+            </CatalogProvider>
+          </AuthProvider>
         </LanguageProvider>
       </body>
     </html>

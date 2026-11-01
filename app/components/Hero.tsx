@@ -31,7 +31,7 @@ function placement(index: number, active: number, count: number) {
 
 export const Hero: React.FC = () => {
   const { t } = useLanguage();
-  const { dishes } = useCatalog();
+  const { dishes, info } = useCatalog();
   const heroDishes = HERO_IDS.map((id) => dishes.find((dish) => dish.id === id)).filter((dish): dish is Dish => Boolean(dish));
   const slides = heroDishes.length > 0 ? heroDishes : dishes.slice(0, 6);
   const [active, setActive] = useState(0);
@@ -45,8 +45,8 @@ export const Hero: React.FC = () => {
     const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
     const applyMotion = () => setReduced(motionQuery.matches);
     const applyVisibility = () => setHidden(document.hidden);
-    applyMotion();
-    applyVisibility();
+    queueMicrotask(applyMotion);
+    queueMicrotask(applyVisibility);
     motionQuery.addEventListener("change", applyMotion);
     document.addEventListener("visibilitychange", applyVisibility);
     return () => {
@@ -64,7 +64,7 @@ export const Hero: React.FC = () => {
   }, [paused, reduced, hidden, active, count]);
 
   useEffect(() => {
-    if (count > 0 && active >= count) setActive(0);
+    if (count > 0 && active >= count) queueMicrotask(() => setActive(0));
   }, [active, count]);
 
   const go = (step: number) => {
@@ -80,7 +80,7 @@ export const Hero: React.FC = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-16 grid lg:grid-cols-2 gap-8 lg:gap-6 items-center">
         <div className="min-h-[15rem]">
-          <p className="text-sm font-semibold tracking-[0.18em] text-terra uppercase">11:00 — 23:00</p>
+          <p className="text-sm font-semibold tracking-[0.18em] text-terra uppercase">{info?.hoursShort || t("Kitchen hours", "Horaires")}</p>
           {dish && <AnimatePresence mode="wait">
             <motion.div
               key={dish.id}

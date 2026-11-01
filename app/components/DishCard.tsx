@@ -1,9 +1,10 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import { Check, Heart, Plus, Star } from "lucide-react";
 import { DishImage } from "./DishImage";
-import type { Dish } from "../data/menuData";
+import { dishPath, type Dish } from "../data/menuData";
 import { formatPrice } from "../lib/pricing";
 import { useCart } from "../context/CartContext";
 import { useWishlist } from "../context/WishlistContext";
@@ -15,15 +16,18 @@ export function DishCard({ dish }: { dish: Dish }) {
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const [added, setAdded] = useState(false);
   const saved = isInWishlist(dish.id);
+  const orderable = dish.orderable !== false && dish.available !== false;
+  const customizable = (dish.variants?.length ?? 0) > 0 || (dish.extras?.length ?? 0) > 0;
 
   const handleAdd = () => {
+    if (!orderable) return;
     addToCart({
       id: dish.id,
+      productId: dish.id,
       name: dish.name,
       price: dish.price,
       image: dish.image,
       category: dish.category,
-      rating: dish.rating,
       description: dish.description,
     });
     setAdded(true);
@@ -51,7 +55,7 @@ export function DishCard({ dish }: { dish: Dish }) {
         <button
           type="button"
           onClick={toggleSaved}
-          aria-label={saved ? `Remove ${dish.name} from wishlist` : `Save ${dish.name}`}
+          aria-label={saved ? t(`Remove ${dish.name} from wishlist`, `Retirer ${dish.name} de la liste`) : t(`Save ${dish.name}`, `Enregistrer ${dish.name}`)}
           className={`absolute top-3 right-3 h-9 w-9 rounded-full flex items-center justify-center shadow-sm ${
             saved ? "bg-terra text-ink" : "bg-white/90 text-ink"
           }`}
@@ -62,25 +66,38 @@ export function DishCard({ dish }: { dish: Dish }) {
 
       <div className="px-2 pt-4 pb-2 flex flex-col flex-1">
         <div className="flex items-start justify-between gap-3">
-          <h3 className="font-serif text-[1.35rem] leading-tight text-ink">{dish.name}</h3>
-          <span className="flex items-center gap-1 text-xs font-bold text-amber-700 shrink-0">
-            <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-            {dish.rating.toFixed(1)}
-          </span>
+          <h3 className="font-serif text-[1.35rem] leading-tight text-ink">
+            <Link href={dishPath(dish)} className="hover:text-terra-deep">{dish.name}</Link>
+          </h3>
+          {dish.reviewCount ? (
+            <span className="flex items-center gap-1 text-xs font-bold text-amber-700 shrink-0">
+              <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+              {dish.reviewAverage?.toFixed(1)}
+              <span className="sr-only">{t(`${dish.reviewCount} verified reviews`, `${dish.reviewCount} avis vérifiés`)}</span>
+            </span>
+          ) : null}
         </div>
         <p className="text-sm text-muted mt-2 leading-relaxed line-clamp-2">{dish.description}</p>
         <div className="mt-4 flex items-center justify-between gap-3">
           <span className="text-lg font-extrabold text-terra">{formatPrice(dish.price)}</span>
-          <button
-            type="button"
-            onClick={handleAdd}
-            className={`inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-bold ${
-              added ? "bg-sage text-cream" : "bg-terra hover:bg-terra-deep text-ink"
-            }`}
-          >
-            {added ? <Check className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
-            {added ? t("Added", "Ajouté") : t("Add", "Ajouter")}
-          </button>
+          <div className="flex items-center gap-2">
+            {customizable && (
+              <Link href={dishPath(dish)} className="text-sm font-bold text-sage">
+                {t("Customise", "Personnaliser")}
+              </Link>
+            )}
+            <button
+              type="button"
+              onClick={handleAdd}
+              disabled={!orderable}
+              className={`inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-bold disabled:cursor-not-allowed disabled:opacity-50 ${
+                added ? "bg-sage text-cream" : "bg-terra hover:bg-terra-deep text-ink"
+              }`}
+            >
+              {added ? <Check className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+              {orderable ? (added ? t("Added", "Ajouté") : t("Add", "Ajouter")) : t("Unavailable", "Indisponible")}
+            </button>
+          </div>
         </div>
       </div>
     </article>

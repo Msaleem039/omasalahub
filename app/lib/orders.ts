@@ -1,70 +1,37 @@
+import type { FulfillmentStatus, PaymentStatus } from "./rules";
+
+export type OrderStatus = FulfillmentStatus;
 export type PaymentMethod = "cod" | "online";
-export type OrderStatus = "confirmed" | "preparing" | "on_the_way" | "delivered" | "cancelled";
 
-export const ORDER_STATUSES: OrderStatus[] = ["confirmed", "preparing", "on_the_way", "delivered", "cancelled"];
+export const ORDER_STATUSES: OrderStatus[] = [
+  "pending",
+  "confirmed",
+  "preparing",
+  "ready",
+  "on_the_way",
+  "completed",
+  "cancelled",
+];
 
-export interface OrderLine {
-  id: string;
-  name: string;
-  price: number;
-  quantity: number;
-  image: string;
-}
+export const STATUS_LABEL: Record<OrderStatus, { en: string; fr: string }> = {
+  pending: { en: "Pending", fr: "En attente" },
+  confirmed: { en: "Confirmed", fr: "Confirmée" },
+  preparing: { en: "Preparing", fr: "En préparation" },
+  ready: { en: "Ready for pickup", fr: "Prête au retrait" },
+  on_the_way: { en: "Out for delivery", fr: "En livraison" },
+  completed: { en: "Completed", fr: "Terminée" },
+  cancelled: { en: "Cancelled", fr: "Annulée" },
+};
 
-export interface SavedOrder {
-  id: string;
-  items: OrderLine[];
-  subtotal: number;
-  deliveryFee: number;
-  total: number;
-  paymentMethod: PaymentMethod;
-  cardLast4?: string;
-  customer: {
-    name: string;
-    phone: string;
-    address: string;
-    note: string;
-  };
-  status?: OrderStatus;
-  createdAt: string;
-}
+export const PAYMENT_STATUS_LABEL: Record<PaymentStatus, { en: string; fr: string }> = {
+  unpaid: { en: "Unpaid", fr: "Non payée" },
+  pending: { en: "Payment pending", fr: "Paiement en attente" },
+  paid: { en: "Paid", fr: "Payée" },
+  failed: { en: "Payment failed", fr: "Paiement refusé" },
+  cancelled: { en: "Payment cancelled", fr: "Paiement annulé" },
+};
 
-const ORDERS_KEY = "bitebloom_orders";
-
-export function paymentLabel(method: PaymentMethod) {
-  return method === "cod" ? "Cash on delivery" : "Online payment";
-}
-
-export function orderStatus(order: SavedOrder): OrderStatus {
-  return order.status ?? "confirmed";
-}
-
-export function updateOrderStatus(id: string, status: OrderStatus) {
-  const next = getOrders().map((order) => (order.id === id ? { ...order, status } : order));
-  localStorage.setItem(ORDERS_KEY, JSON.stringify(next));
-  return next;
-}
-
-export function getOrders(): SavedOrder[] {
-  if (typeof window === "undefined") return [];
-  try {
-    const raw = localStorage.getItem(ORDERS_KEY);
-    return raw ? (JSON.parse(raw) as SavedOrder[]) : [];
-  } catch {
-    return [];
-  }
-}
-
-export function getOrder(id: string) {
-  return getOrders().find((order) => order.id.toLowerCase() === id.toLowerCase());
-}
-
-export function saveOrder(order: SavedOrder) {
-  const next = [order, ...getOrders().filter((item) => item.id !== order.id)];
-  localStorage.setItem(ORDERS_KEY, JSON.stringify(next));
-}
-
-export function createOrderId() {
-  const stamp = Date.now().toString().slice(-6);
-  return `OM-${stamp}`;
-}
+export const METHOD_LABEL = {
+  cod: { en: "Cash on delivery or pickup", fr: "Espèces à la livraison ou au retrait" },
+  online: { en: "Online payment", fr: "Paiement en ligne" },
+};

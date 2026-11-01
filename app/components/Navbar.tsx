@@ -82,7 +82,7 @@ export const Navbar: React.FC = () => {
                   </span>
                 )}
               </Link>
-              <Link href="/login" className="p-2 text-cream/85 hover:text-terra" aria-label={t("Log in", "Connexion")}>
+              <Link href="/profile" className="p-2 text-cream/85 hover:text-terra" aria-label={t("Account", "Compte")}>
                 <User className="w-5 h-5" />
               </Link>
               <button
@@ -108,8 +108,11 @@ export const Navbar: React.FC = () => {
                   {t(link.en, link.fr)}
                 </Link>
               ))}
-              <Link href="/login" onClick={() => setMobileMenuOpen(false)} className="px-2 py-3 font-semibold text-cream">
-                {t("Log in", "Connexion")}
+              <Link href="/profile" onClick={() => setMobileMenuOpen(false)} className="px-2 py-3 font-semibold text-cream">
+                {t("Account", "Compte")}
+              </Link>
+              <Link href="/orders" onClick={() => setMobileMenuOpen(false)} className="px-2 py-3 font-semibold text-cream">
+                {t("Orders", "Commandes")}
               </Link>
             </nav>
           )}

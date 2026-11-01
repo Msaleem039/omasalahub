@@ -1,22 +1,24 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 
-// Line 7: Self-contained Interface for Cart Items
 export interface CartItemType {
   id: string;
+  productId?: string;
   name: string;
   price: number;
   image: string;
   category?: string;
-  rating?: number;
   description?: string;
   quantity?: number;
+  variantIds?: string[];
+  extraIds?: string[];
+  optionsLabel?: string;
 }
 
 interface CartContextType {
   cart: CartItemType[];
-  addToCart: (item: CartItemType) => void;
+  addToCart: (item: CartItemType, amount?: number) => void;
   removeFromCart: (id: string) => void;
   updateQuantity: (id: string, delta: number) => void;
   clearCart: () => void;
@@ -24,39 +26,53 @@ interface CartContextType {
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
+function lineIdFor(item: CartItemType) {
+  const productId = item.productId || item.id;
+  const variantIds = [...(item.variantIds ?? [])].sort();
+  const extraIds = [...(item.extraIds ?? [])].sort();
+  return [productId, ...variantIds, ...extraIds].join("|");
+}
+
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [cart, setCart] = useState<CartItemType[]>([]);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     const savedCart = localStorage.getItem("bitebloom_cart");
-    if (savedCart) {
-      try {
-        setCart(JSON.parse(savedCart));
-      } catch (error) {
-        console.error("Cart loading error:", error);
+    queueMicrotask(() => {
+      if (savedCart) {
+        try {
+          const parsed = JSON.parse(savedCart) as CartItemType[];
+          if (Array.isArray(parsed)) {
+            setCart(parsed.map((item) => ({ ...item, productId: item.productId || item.id, id: lineIdFor(item) })));
+          }
+        } catch (error) {
+          console.error("Cart loading error:", error);
+        }
       }
-    }
+      setReady(true);
+    });
   }, []);
 
   useEffect(() => {
+    if (!ready) return;
     localStorage.setItem("bitebloom_cart", JSON.stringify(cart));
-  }, [cart]);
+  }, [cart, ready]);
 
-  const addToCart = (item: CartItemType) => {
+  const addToCart = (item: CartItemType, amount = 1) => {
+    const productId = item.productId || item.id;
+    const variantIds = [...(item.variantIds ?? [])].sort();
+    const extraIds = [...(item.extraIds ?? [])].sort();
+    const id = lineIdFor({ ...item, productId, variantIds, extraIds });
+    const quantity = Math.max(1, amount);
     setCart((prev) => {
-      const existingItemIndex = prev.findIndex((cartItem) => cartItem.id === item.id);
-      
-      if (existingItemIndex > -1) {
-        const updatedCart = [...prev];
-        const currentQty = updatedCart[existingItemIndex].quantity || 1;
-        updatedCart[existingItemIndex] = {
-          ...updatedCart[existingItemIndex],
-          quantity: currentQty + 1,
-        };
-        return updatedCart;
+      const index = prev.findIndex((entry) => entry.id === id);
+      if (index > -1) {
+        const next = [...prev];
+        next[index] = { ...next[index], quantity: (next[index].quantity || 1) + quantity };
+        return next;
       }
-      
-      return [...prev, { ...item, quantity: 1 }];
+      return [...prev, { ...item, id, productId, variantIds, extraIds, quantity }];
     });
   };
 
@@ -68,13 +84,11 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setCart((prev) =>
       prev
         .map((item) => {
-          if (item.id === id) {
-            const newQuantity = (item.quantity || 1) + delta;
-            return newQuantity > 0 ? { ...item, quantity: newQuantity } : null;
-          }
-          return item;
+          if (item.id !== id) return item;
+          const nextQuantity = (item.quantity || 1) + delta;
+          return nextQuantity > 0 ? { ...item, quantity: nextQuantity } : null;
         })
-        .filter(Boolean) as CartItemType[]
+        .filter((item): item is CartItemType => Boolean(item)),
     );
   };
 

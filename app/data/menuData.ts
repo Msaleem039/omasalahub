@@ -7,14 +7,42 @@ export type MenuCategory =
   | "formules"
   | "boissons";
 
+export interface DishVariant {
+  id: string;
+  group: string;
+  name: string;
+  priceDelta: number;
+  available: boolean;
+}
+
+export interface DishExtra {
+  id: string;
+  name: string;
+  price: number;
+  available: boolean;
+}
+
 export interface Dish {
   id: string;
   name: string;
   category: MenuCategory;
   price: number;
-  rating: number;
+  /** Legacy catalog field. Customer ratings come from verified reviews, not this value. */
+  rating?: number;
   image: string;
   description: string;
+  slug?: string;
+  available?: boolean;
+  orderable?: boolean;
+  stock?: number | null;
+  allergens?: string;
+  ingredients?: string;
+  isCombo?: boolean;
+  variants?: DishVariant[];
+  extras?: DishExtra[];
+  reviewAverage?: number | null;
+  reviewCount?: number;
+  relatedIds?: string[];
 }
 
 export const CATEGORIES: { slug: MenuCategory | "all"; label: string }[] = [
@@ -253,4 +281,19 @@ export function categoryLabel(slug: string, lang: "en" | "fr" = "fr") {
 export function dishesByCategory(slug: string) {
   if (slug === "all") return DISHES;
   return DISHES.filter((dish) => dish.category === slug);
+}
+
+export function dishSlug(dish: { id: string; name: string; slug?: string }) {
+  if (dish.slug) return dish.slug;
+  const base = dish.name
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  return base || dish.id;
+}
+
+export function dishPath(dish: { id: string; name: string; slug?: string }) {
+  return `/plat/${dishSlug(dish)}`;
 }

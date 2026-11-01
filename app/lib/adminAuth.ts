@@ -1,16 +1,10 @@
-const SESSION_KEY = "masalahub_admin";
-
-export function loginSuperadmin(_email: string, _password: string) {
-  // Temporary: any login opens the admin panel while it is being tested.
-  localStorage.setItem(SESSION_KEY, "1");
-  return true;
+/** Account sessions are issued by /api/auth/login. Browser flags are not accepted. */
+export function loginSuperadmin() {
+  return false;
 }
 
-export function logoutSuperadmin() {
-  localStorage.removeItem(SESSION_KEY);
-}
+export function logoutSuperadmin() {}
 
 export function isSuperadmin() {
-  if (typeof window === "undefined") return false;
-  return localStorage.getItem(SESSION_KEY) === "1";
+  return false;
 }

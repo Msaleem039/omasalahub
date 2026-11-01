@@ -1,102 +1,80 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { SiteShell } from "../components/SiteShell";
-import { formatPrice } from "../lib/pricing";
-import { getOrders, paymentLabel, type SavedOrder } from "../lib/orders";
-
-const PROFILE_KEY = "bitebloom_profile";
-
-interface Profile {
-  name: string;
-  email: string;
-  phone: string;
-  address: string;
-}
-
-const emptyProfile: Profile = { name: "", email: "", phone: "", address: "" };
+import { useAuth } from "../context/AuthContext";
+import { useLanguage } from "../context/LanguageContext";
+import { apiFetch } from "../lib/clientApi";
+import { errorText } from "../lib/errors";
 
 export default function ProfilePage() {
-  const [profile, setProfile] = useState<Profile>(emptyProfile);
-  const [orders, setOrders] = useState<SavedOrder[]>([]);
-  const [saved, setSaved] = useState(false);
+  const { t, lang } = useLanguage();
+  const { user, ready, refresh, logout } = useAuth();
+  const [overrides, setOverrides] = useState<{ name?: string; phone?: string; address?: string }>({});
+  const [message, setMessage] = useState("");
+  const name = overrides.name ?? user?.name ?? "";
+  const phone = overrides.phone ?? user?.phone ?? "";
+  const address = overrides.address ?? user?.address ?? "";
 
-  useEffect(() => {
-    const raw = localStorage.getItem(PROFILE_KEY);
-    if (raw) {
-      try {
-        setProfile({ ...emptyProfile, ...JSON.parse(raw) });
-      } catch {
-        /* keep empty form */
-      }
-    }
-    setOrders(getOrders());
-  }, []);
-
-  const save = (event: React.FormEvent) => {
+  const save = async (event: React.FormEvent) => {
     event.preventDefault();
-    localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
-    setSaved(true);
+    setMessage("");
+    const response = await apiFetch("/api/user/me", {
+      method: "PATCH",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ name, phone, address }),
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      setMessage(errorText(data.error || "generic", lang));
+      return;
+    }
+    await refresh();
+    setMessage(t("Saved. Checkout can use these details.", "Enregistré. La commande peut réutiliser ces informations."));
   };
-
-  const initials = (profile.name || "Guest")
-    .split(" ")
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase() ?? "")
-    .join("");
 
   return (
     <SiteShell>
-      <main className="max-w-3xl mx-auto px-4 py-12 space-y-8">
-        <div className="flex items-center gap-4">
-          <div className="w-16 h-16 rounded-full bg-sage-soft text-sage font-serif text-2xl flex items-center justify-center">
-            {initials || "BB"}
+      <main className="mx-auto max-w-3xl space-y-8 px-4 py-12">
+        {!ready ? <div className="h-40 animate-pulse rounded-3xl bg-card" /> : null}
+        {ready && !user && (
+          <div className="rounded-3xl border border-[#e5dcc8] bg-card p-8 text-center">
+            <h1 className="script-title text-6xl">{t("Your account", "Votre compte")}</h1>
+            <p className="mt-3 text-muted">{t("Log in to see your details and orders.", "Connectez-vous pour voir vos informations et vos commandes.")}</p>
+            <Link href="/login" className="mt-6 inline-flex rounded-full bg-terra px-6 py-3 font-bold text-ink">{t("Log in", "Connexion")}</Link>
           </div>
-          <div>
-            <h1 className="script-title text-6xl leading-none">{profile.name || "Your profile"}</h1>
-            <p className="text-sm text-muted">{profile.email || "Saved on this device"}</p>
-          </div>
-        </div>
-
-        <form onSubmit={save} className="bg-card rounded-3xl border border-[#e5dcc8] p-6 space-y-4">
-          <label className="block text-sm font-bold">Name
-            <input className="field mt-1" value={profile.name} onChange={(e) => setProfile({ ...profile, name: e.target.value })} />
-          </label>
-          <label className="block text-sm font-bold">Email
-            <input type="email" className="field mt-1" value={profile.email} onChange={(e) => setProfile({ ...profile, email: e.target.value })} />
-          </label>
-          <label className="block text-sm font-bold">Phone
-            <input className="field mt-1" value={profile.phone} onChange={(e) => setProfile({ ...profile, phone: e.target.value })} />
-          </label>
-          <label className="block text-sm font-bold">Delivery address
-            <textarea className="field mt-1" rows={3} value={profile.address} onChange={(e) => setProfile({ ...profile, address: e.target.value })} />
-          </label>
-          <button type="submit" className="bg-terra text-ink font-bold px-6 py-3 rounded-full">Save details</button>
-          {saved && <p className="text-sm text-sage">Saved. Checkout will use this name, phone, and address.</p>}
-        </form>
-
-        <section>
-          <h2 className="font-serif text-3xl mb-3">Orders</h2>
-          {orders.length === 0 ? (
-            <p className="text-muted">No orders yet. <Link href="/menu" className="text-terra font-bold">Start with the menu.</Link></p>
-          ) : (
-            <ul className="space-y-3">
-              {orders.map((order) => (
-                <li key={order.id} className="bg-card border border-[#e5dcc8] rounded-2xl p-4 flex items-center justify-between gap-3">
-                  <div>
-                    <p className="font-bold">{order.id}</p>
-                    <p className="text-xs text-muted">{paymentLabel(order.paymentMethod)} · {order.items.length} dishes</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-bold">{formatPrice(order.total)}</p>
-                    <Link href={`/track-order?id=${order.id}`} className="text-xs text-terra font-bold">Track</Link>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
-        </section>
+        )}
+        {user && (
+          <>
+            <div>
+              <h1 className="script-title text-6xl leading-none">{user.name}</h1>
+              <p className="text-sm text-muted">{user.email}</p>
+            </div>
+            {user.role === "customer" ? (
+              <form onSubmit={save} className="space-y-4 rounded-3xl border border-[#e5dcc8] bg-card p-6">
+                <label className="block text-sm font-bold">{t("Name", "Nom")}
+                  <input className="field mt-1" value={name} onChange={(event) => setOverrides((current) => ({ ...current, name: event.target.value }))} />
+                </label>
+                <label className="block text-sm font-bold">{t("Phone", "Téléphone")}
+                  <input className="field mt-1" value={phone} onChange={(event) => setOverrides((current) => ({ ...current, phone: event.target.value }))} />
+                </label>
+                <label className="block text-sm font-bold">{t("Delivery address", "Adresse de livraison")}
+                  <textarea className="field mt-1" rows={3} value={address} onChange={(event) => setOverrides((current) => ({ ...current, address: event.target.value }))} />
+                </label>
+                <button type="submit" className="rounded-full bg-terra px-6 py-3 font-bold text-ink">{t("Save details", "Enregistrer")}</button>
+                {message && <p className="text-sm text-sage">{message}</p>}
+              </form>
+            ) : (
+              <p className="text-sm text-muted">{t("This is the restaurant admin account.", "Ceci est le compte d'administration du restaurant.")}</p>
+            )}
+            <div className="flex flex-wrap gap-3">
+              <Link href="/orders" className="rounded-full bg-ink px-5 py-3 text-sm font-bold text-cream">{t("Order history", "Historique")}</Link>
+              {user.role === "admin" && <Link href="/admin" className="rounded-full border border-[#e5dcc8] px-5 py-3 text-sm font-bold">{t("Admin", "Administration")}</Link>}
+              <button type="button" onClick={() => logout()} className="rounded-full border border-[#e5dcc8] px-5 py-3 text-sm font-bold">{t("Log out", "Déconnexion")}</button>
+            </div>
+          </>
+        )}
       </main>
     </SiteShell>
   );

@@ -2,36 +2,17 @@
 
 import React, { useMemo, useState } from "react";
 import { formatPrice } from "../../lib/pricing";
-import {
-  ORDER_STATUSES,
-  orderStatus,
-  paymentLabel,
-  updateOrderStatus,
-  type OrderStatus,
-  type PaymentMethod,
-  type SavedOrder,
-} from "../../lib/orders";
+import { METHOD_LABEL, ORDER_STATUSES, PAYMENT_STATUS_LABEL, STATUS_LABEL, type OrderStatus, type PaymentMethod } from "../../lib/orders";
 import { useLanguage } from "../../context/LanguageContext";
-
-const STATUS_LABEL: Record<OrderStatus, { en: string; fr: string }> = {
-  confirmed: { en: "Confirmed", fr: "Confirmée" },
-  preparing: { en: "Preparing", fr: "En préparation" },
-  on_the_way: { en: "On the way", fr: "En livraison" },
-  delivered: { en: "Delivered", fr: "Livrée" },
-  cancelled: { en: "Cancelled", fr: "Annulée" },
-};
+import type { PaymentStatus } from "../../lib/rules";
+import { apiFetch } from "../../lib/clientApi";
+import type { PublicOrder } from "../../lib/types";
 
 function when(iso: string) {
   return new Intl.DateTimeFormat("fr-FR", { dateStyle: "medium", timeStyle: "short" }).format(new Date(iso));
 }
 
-export function OrdersPanel({
-  orders,
-  onOrders,
-}: {
-  orders: SavedOrder[];
-  onOrders: (orders: SavedOrder[]) => void;
-}) {
+export function OrdersPanel({ orders, onOrders }: { orders: PublicOrder[]; onOrders: (orders: PublicOrder[]) => void }) {
   const { t } = useLanguage();
   const [openId, setOpenId] = useState<string | null>(null);
   const [query, setQuery] = useState("");
@@ -42,17 +23,25 @@ export function OrdersPanel({
     const needle = query.trim().toLowerCase();
     return orders.filter((order) => {
       if (payment !== "all" && order.paymentMethod !== payment) return false;
-      if (status !== "all" && orderStatus(order) !== status) return false;
+      if (status !== "all" && order.status !== status) return false;
       if (!needle) return true;
-      const haystack = [order.id, order.customer.name, order.customer.phone, order.customer.address, ...order.items.map((item) => item.name)]
-        .join(" ")
-        .toLowerCase();
-      return haystack.includes(needle);
+      return [order.id, order.customer.name, order.customer.phone, order.customer.address, ...order.items.map((item) => item.name)].join(" ").toLowerCase().includes(needle);
     });
   }, [orders, payment, query, status]);
 
-  const revenue = orders.filter((order) => orderStatus(order) !== "cancelled").reduce((sum, order) => sum + order.total, 0);
-  const active = orders.filter((order) => ["confirmed", "preparing", "on_the_way"].includes(orderStatus(order))).length;
+  const revenue = orders.filter((order) => order.status !== "cancelled" && order.paymentStatus === "paid").reduce((sum, order) => sum + order.total, 0);
+  const active = orders.filter((order) => ["pending", "confirmed", "preparing", "ready", "on_the_way"].includes(order.status)).length;
+
+  const patch = async (id: string, body: { fulfillment?: string; payment?: string }) => {
+    const response = await apiFetch(`/api/order/status/${id}`, {
+      method: "PATCH",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    const data = await response.json();
+    if (!response.ok) return;
+    onOrders(orders.map((order) => (order.id === id ? data.order : order)));
+  };
 
   return (
     <div>
@@ -67,17 +56,16 @@ export function OrdersPanel({
           <p className="mt-1 font-serif text-3xl">{active}</p>
         </article>
         <article className="rounded-2xl border border-[#e4d8c4] bg-card p-4">
-          <p className="text-xs font-bold uppercase tracking-wide text-muted">{t("Revenue", "Chiffre")}</p>
+          <p className="text-xs font-bold uppercase tracking-wide text-muted">{t("Paid revenue", "Encaissé")}</p>
           <p className="mt-1 font-serif text-3xl">{formatPrice(revenue)}</p>
         </article>
       </section>
-
       <div className="mb-4 grid gap-3 sm:grid-cols-3">
         <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={t("Search order, name, phone, dish", "Rechercher commande, nom, téléphone")} className="field" />
         <select value={payment} onChange={(event) => setPayment(event.target.value as "all" | PaymentMethod)} className="field">
           <option value="all">{t("All payments", "Tous les paiements")}</option>
-          <option value="cod">{t("Cash on delivery", "Paiement à la livraison")}</option>
-          <option value="online">{t("Online payment", "Paiement en ligne")}</option>
+          <option value="cod">{t(METHOD_LABEL.cod.en, METHOD_LABEL.cod.fr)}</option>
+          <option value="online">{t(METHOD_LABEL.online.en, METHOD_LABEL.online.fr)}</option>
         </select>
         <select value={status} onChange={(event) => setStatus(event.target.value as "all" | OrderStatus)} className="field">
           <option value="all">{t("All statuses", "Tous les statuts")}</option>
@@ -86,17 +74,11 @@ export function OrdersPanel({
           ))}
         </select>
       </div>
-
       {visible.length === 0 ? (
-        <p className="rounded-3xl border border-[#e4d8c4] bg-card p-8 text-muted">
-          {orders.length === 0
-            ? t("No orders yet. A checkout on this browser will appear in this list.", "Aucune commande. Un paiement sur ce navigateur apparaîtra ici.")
-            : t("No orders match this search.", "Aucune commande ne correspond.")}
-        </p>
+        <p className="rounded-3xl border border-[#e4d8c4] bg-card p-8 text-muted">{t("No orders match.", "Aucune commande.")}</p>
       ) : (
         <ul className="space-y-3">
           {visible.map((order) => {
-            const current = orderStatus(order);
             const open = openId === order.id;
             return (
               <li key={order.id} className="overflow-hidden rounded-3xl border border-[#e4d8c4] bg-card">
@@ -105,43 +87,45 @@ export function OrdersPanel({
                     <p className="font-bold">{order.id}</p>
                     <p className="truncate text-sm text-muted">{order.customer.name} · {when(order.createdAt)}</p>
                   </div>
-                  <span className="text-xs font-bold uppercase tracking-wide text-sage">{paymentLabel(order.paymentMethod)}</span>
+                  <span className="text-xs font-bold uppercase tracking-wide text-sage">{t(PAYMENT_STATUS_LABEL[order.paymentStatus].en, PAYMENT_STATUS_LABEL[order.paymentStatus].fr)}</span>
                   <span className="text-sm font-bold">{formatPrice(order.total)}</span>
                 </button>
                 {open && (
                   <div className="grid gap-6 border-t border-[#efe6d2] px-4 pb-5 pt-4 sm:px-5 lg:grid-cols-2">
                     <div>
-                      <p className="mb-2 text-xs font-bold uppercase tracking-wide text-muted">{t("Customer", "Client")}</p>
                       <p className="font-bold">{order.customer.name}</p>
                       <p className="text-sm">{order.customer.phone}</p>
-                      <p className="mt-1 text-sm text-muted">{order.customer.address}</p>
+                      {order.customer.address && <p className="mt-1 text-sm text-muted">{order.customer.address}</p>}
                       {order.customer.note && <p className="mt-2 text-sm">{t("Note", "Note")}: {order.customer.note}</p>}
-                      {order.cardLast4 && <p className="mt-2 text-sm">{t("Card ending", "Carte finissant par")} {order.cardLast4}</p>}
-                      <label className="mt-4 block text-sm font-bold">
-                        {t("Status", "Statut")}
-                        <select
-                          value={current}
-                          onChange={(event) => onOrders(updateOrderStatus(order.id, event.target.value as OrderStatus))}
-                          className="field mt-1"
-                        >
+                      <p className="mt-2 text-sm">{order.service === "pickup" ? t("Pickup", "Retrait") : t("Delivery", "Livraison")}</p>
+                      <label className="mt-4 block text-sm font-bold">{t("Kitchen status", "Statut cuisine")}
+                        <select value={order.status} onChange={(event) => patch(order.id, { fulfillment: event.target.value })} className="field mt-1">
                           {ORDER_STATUSES.map((item) => (
                             <option key={item} value={item}>{t(STATUS_LABEL[item].en, STATUS_LABEL[item].fr)}</option>
                           ))}
                         </select>
                       </label>
+                      <label className="mt-3 block text-sm font-bold">{t("Payment status", "Statut de paiement")}
+                        <select value={order.paymentStatus} onChange={(event) => patch(order.id, { payment: event.target.value as PaymentStatus })} className="field mt-1">
+                          {(Object.keys(PAYMENT_STATUS_LABEL) as PaymentStatus[]).map((item) => (
+                            <option key={item} value={item}>{t(PAYMENT_STATUS_LABEL[item].en, PAYMENT_STATUS_LABEL[item].fr)}</option>
+                          ))}
+                        </select>
+                      </label>
+                      {order.paymentMethod === "online" && <p className="mt-2 text-xs text-muted">{t("Online payments are marked paid only by the payment provider.", "Un paiement en ligne n'est marqué payé que par le prestataire.")}</p>}
                     </div>
                     <div>
-                      <p className="mb-2 text-xs font-bold uppercase tracking-wide text-muted">{t("Items", "Plats")}</p>
                       <ul className="space-y-2 text-sm">
                         {order.items.map((item) => (
                           <li key={item.id} className="flex justify-between gap-3">
-                            <span>{item.quantity} × {item.name}</span>
+                            <span>{item.quantity} × {item.name}{item.optionsLabel ? ` (${item.optionsLabel})` : ""}</span>
                             <span>{formatPrice(item.price * item.quantity)}</span>
                           </li>
                         ))}
                       </ul>
                       <div className="mt-4 space-y-1 border-t border-[#efe6d2] pt-3 text-sm">
                         <p className="flex justify-between"><span>{t("Subtotal", "Sous-total")}</span><span>{formatPrice(order.subtotal)}</span></p>
+                        <p className="flex justify-between"><span>{t("Discount", "Réduction")}</span><span>{formatPrice(order.discount)}</span></p>
                         <p className="flex justify-between"><span>{t("Delivery", "Livraison")}</span><span>{formatPrice(order.deliveryFee)}</span></p>
                         <p className="flex justify-between font-bold"><span>Total</span><span>{formatPrice(order.total)}</span></p>
                       </div>

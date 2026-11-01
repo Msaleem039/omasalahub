@@ -21,21 +21,27 @@ const WishlistContext = createContext<WishlistContextType | undefined>(undefined
 
 export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [wishlist, setWishlist] = useState<WishlistItem[]>([]);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     const saved = localStorage.getItem("bitebloom_wishlist");
-    if (saved) {
-      try {
-        setWishlist(JSON.parse(saved));
-      } catch (e) {
-        console.error("Failed to parse wishlist", e);
+    queueMicrotask(() => {
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved) as WishlistItem[];
+          if (Array.isArray(parsed)) setWishlist(parsed);
+        } catch (e) {
+          console.error("Failed to parse wishlist", e);
+        }
       }
-    }
+      setReady(true);
+    });
   }, []);
 
   useEffect(() => {
+    if (!ready) return;
     localStorage.setItem("bitebloom_wishlist", JSON.stringify(wishlist));
-  }, [wishlist]);
+  }, [wishlist, ready]);
 
   const addToWishlist = (item: WishlistItem) => {
     setWishlist((prev) => {
