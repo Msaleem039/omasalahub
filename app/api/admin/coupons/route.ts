@@ -8,7 +8,6 @@ export async function GET() {
   if (!(await requireAdmin())) return fail("forbidden", 401);
   return json({ coupons: listCoupons(getDb()) });
 }
-
 export async function POST(request: Request) {
   if (!(await requireAdmin())) return fail("forbidden", 401);
   const body = (await readJson(request)) as Record<string, unknown> | null;
