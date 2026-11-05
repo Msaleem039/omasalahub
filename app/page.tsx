@@ -9,7 +9,7 @@ import { Hero } from "./components/Hero";
 import { Footer } from "./components/Footer";
 import { DishCard } from "./components/DishCard";
 import { OrderingBanner } from "./components/OrderingBanner";
-import { categoryLabel, type Dish } from "./data/menuData";
+import { categoryLabel, dishName, type Dish } from "./data/menuData";
 import { useCatalog } from "./context/CatalogContext";
 import { useLanguage } from "./context/LanguageContext";
 import { apiFetch } from "./lib/clientApi";
@@ -68,9 +68,9 @@ export default function Home() {
               <div className="bg-sage-soft text-sage p-3 rounded-2xl">
                 <item.icon className="w-5 h-5" />
               </div>
-              <div>
+              <div className="min-w-0">
                 <h4 className="font-bold text-ink">{item.title}</h4>
-                <p className="text-xs text-muted mt-0.5">{item.text}</p>
+                <p className="mt-0.5 text-xs text-muted">{item.text}</p>
               </div>
             </div>
           ))}
@@ -79,7 +79,7 @@ export default function Home() {
 
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 w-full">
         <div className="text-center mb-8">
-          <h2 className="script-title text-6xl">Spécialités</h2>
+          <h2 className="script-title text-5xl sm:text-6xl">Spécialités</h2>
           <p className="text-muted mt-2">{t("Served with basmati rice.", "Servis avec du riz basmati.")}</p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -91,7 +91,7 @@ export default function Home() {
 
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-14 w-full">
         <div className="text-center mb-8">
-          <h2 className="script-title text-6xl">Biryani & Naan</h2>
+          <h2 className="script-title text-5xl sm:text-6xl">Biryani & Naan</h2>
           <p className="text-muted mt-2">{t("From the pot and the tandoor.", "Du faitout et du tandoor.")}</p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -112,16 +112,16 @@ export default function Home() {
           {categories.map((category) => (
             <Link key={category.slug} href={`/menu/${category.slug}`} className="group bg-card rounded-3xl border border-[#e5dcc8] p-4 text-center">
               <div className="relative mx-auto h-28 w-28 rounded-full overflow-hidden">
-                <DishImage src={category.image} alt={category.name} className="object-cover group-hover:scale-105 transition" />
+                <DishImage src={category.image} alt={dishName(category.name, lang)} className="object-cover group-hover:scale-105 transition" />
               </div>
-              <h3 className="mt-3 font-serif text-2xl">{categoryLabel(category.slug, lang)}</h3>
+              <h3 className="mt-3 break-words font-serif text-xl sm:text-2xl">{categoryLabel(category.slug, lang)}</h3>
             </Link>
           ))}
         </div>
       </section>
 
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 w-full">
-        <h2 className="script-title text-6xl text-center mb-8">{t("Verified reviews", "Avis vérifiés")}</h2>
+        <h2 className="script-title mb-8 text-center text-5xl sm:text-6xl">{t("Verified reviews", "Avis vérifiés")}</h2>
         {reviews.length === 0 ? (
           <p className="text-center text-muted">{t("Approved reviews from completed orders will appear here.", "Les avis approuvés, issus de commandes terminées, apparaîtront ici.")}</p>
         ) : (

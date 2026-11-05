@@ -65,10 +65,12 @@ export function HoursPanel() {
         {DAYS.map((day) => {
           const window = info.hours[day.id]?.[0] ?? { open: "", close: "" };
           return (
-            <div key={day.id} className="grid grid-cols-[8rem_1fr_1fr] items-center gap-2">
+            <div key={day.id} className="grid items-center gap-2 sm:grid-cols-[8rem_1fr_1fr]">
               <span className="text-sm font-bold">{lang === "fr" ? day.fr : day.en}</span>
-              <input className="field" type="time" value={window.open} onChange={(event) => setWindow(day.id, "open", event.target.value)} />
-              <input className="field" type="time" value={window.close} onChange={(event) => setWindow(day.id, "close", event.target.value)} />
+              <div className="grid grid-cols-2 gap-2 sm:contents">
+                <input className="field" type="time" value={window.open} onChange={(event) => setWindow(day.id, "open", event.target.value)} />
+                <input className="field" type="time" value={window.close} onChange={(event) => setWindow(day.id, "close", event.target.value)} />
+              </div>
             </div>
           );
         })}

@@ -31,6 +31,7 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   useEffect(() => {
     if (!ready) return;
     document.documentElement.lang = lang;
+    document.documentElement.setAttribute("translate", "no");
   }, [lang, ready]);
 
   const setLang = (next: Language) => {

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
+import { dishName } from "../../data/menuData";
 import { formatPrice } from "../../lib/pricing";
 import { METHOD_LABEL, ORDER_STATUSES, PAYMENT_STATUS_LABEL, STATUS_LABEL, type OrderStatus, type PaymentMethod } from "../../lib/orders";
 import { useLanguage } from "../../context/LanguageContext";
@@ -13,7 +14,7 @@ function when(iso: string) {
 }
 
 export function OrdersPanel({ orders, onOrders }: { orders: PublicOrder[]; onOrders: (orders: PublicOrder[]) => void }) {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const [openId, setOpenId] = useState<string | null>(null);
   const [query, setQuery] = useState("");
   const [payment, setPayment] = useState<"all" | PaymentMethod>("all");
@@ -85,7 +86,7 @@ export function OrdersPanel({ orders, onOrders }: { orders: PublicOrder[]; onOrd
                 <button type="button" onClick={() => setOpenId(open ? null : order.id)} className="flex w-full flex-wrap items-center gap-3 px-4 py-4 text-left sm:px-5">
                   <div className="min-w-0 flex-1">
                     <p className="font-bold">{order.id}</p>
-                    <p className="truncate text-sm text-muted">{order.customer.name} · {when(order.createdAt)}</p>
+                    <p className="truncate text-sm text-muted">{order.customer.name} · {when(order.createdAt)} · {order.service === "pickup" ? t("Takeaway", "À emporter") : t("Home delivery", "Livraison")}</p>
                   </div>
                   <span className="text-xs font-bold uppercase tracking-wide text-sage">{t(PAYMENT_STATUS_LABEL[order.paymentStatus].en, PAYMENT_STATUS_LABEL[order.paymentStatus].fr)}</span>
                   <span className="text-sm font-bold">{formatPrice(order.total)}</span>
@@ -97,7 +98,8 @@ export function OrdersPanel({ orders, onOrders }: { orders: PublicOrder[]; onOrd
                       <p className="text-sm">{order.customer.phone}</p>
                       {order.customer.address && <p className="mt-1 text-sm text-muted">{order.customer.address}</p>}
                       {order.customer.note && <p className="mt-2 text-sm">{t("Note", "Note")}: {order.customer.note}</p>}
-                      <p className="mt-2 text-sm">{order.service === "pickup" ? t("Pickup", "Retrait") : t("Delivery", "Livraison")}</p>
+                      <p className="mt-2 text-sm font-bold">{order.service === "pickup" ? t("Takeaway", "À emporter") : t("Home delivery", "Livraison à domicile")}</p>
+                      {order.scheduledFor && <p className="text-sm text-muted">{t("Pickup time", "Heure de retrait")}: {when(order.scheduledFor)}</p>}
                       <label className="mt-4 block text-sm font-bold">{t("Kitchen status", "Statut cuisine")}
                         <select value={order.status} onChange={(event) => patch(order.id, { fulfillment: event.target.value })} className="field mt-1">
                           {ORDER_STATUSES.map((item) => (
@@ -117,8 +119,8 @@ export function OrdersPanel({ orders, onOrders }: { orders: PublicOrder[]; onOrd
                     <div>
                       <ul className="space-y-2 text-sm">
                         {order.items.map((item) => (
-                          <li key={item.id} className="flex justify-between gap-3">
-                            <span>{item.quantity} × {item.name}{item.optionsLabel ? ` (${item.optionsLabel})` : ""}</span>
+                          <li key={item.id} className="money-row">
+                            <span>{item.quantity} × {dishName(item.name, lang)}{item.optionsLabel ? ` (${dishName(item.optionsLabel, lang)})` : ""}</span>
                             <span>{formatPrice(item.price * item.quantity)}</span>
                           </li>
                         ))}
@@ -126,7 +128,7 @@ export function OrdersPanel({ orders, onOrders }: { orders: PublicOrder[]; onOrd
                       <div className="mt-4 space-y-1 border-t border-[#efe6d2] pt-3 text-sm">
                         <p className="flex justify-between"><span>{t("Subtotal", "Sous-total")}</span><span>{formatPrice(order.subtotal)}</span></p>
                         <p className="flex justify-between"><span>{t("Discount", "Réduction")}</span><span>{formatPrice(order.discount)}</span></p>
-                        <p className="flex justify-between"><span>{t("Delivery", "Livraison")}</span><span>{formatPrice(order.deliveryFee)}</span></p>
+                        <p className="flex justify-between"><span>{order.service === "pickup" ? t("Takeaway", "À emporter") : t("Delivery", "Livraison")}</span><span>{order.service === "pickup" ? t("No delivery fee", "Sans frais de livraison") : formatPrice(order.deliveryFee)}</span></p>
                         <p className="flex justify-between font-bold"><span>Total</span><span>{formatPrice(order.total)}</span></p>
                       </div>
                     </div>

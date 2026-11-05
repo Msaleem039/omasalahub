@@ -28,12 +28,17 @@
   --font-script: var(--font-great-vibes-gf), "Great Vibes", cursive;
 }
 
+html {
+  overflow-x: clip;
+}
+
 body {
   background:
     radial-gradient(880px 520px at 108% -8%, rgba(18, 56, 44, 0.06), transparent 62%),
     #f8f4ea;
   color: var(--ink);
   font-family: var(--font-nunito-gf), "Nunito", sans-serif;
+  overflow-x: clip;
 }
 
 ::selection {
@@ -59,6 +64,26 @@ body {
 .script-title {
   font-family: var(--font-great-vibes-gf), "Great Vibes", cursive;
   font-weight: 400;
-  line-height: 0.95;
+  line-height: 1.05;
   color: #e0b15a;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.money-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.money-row > :first-child {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.money-row > :last-child {
+  max-width: 58%;
+  flex-shrink: 0;
+  text-align: right;
 }

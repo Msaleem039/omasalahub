@@ -26,8 +26,9 @@ const script = Great_Vibes({
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"),
-  title: "Masala Hub - Biryani, Curries & Naans",
-  description: "Commandez butter chicken, biryani, naan et spécialités maison chez Masala Hub.",
+  title: "Masala Hub — Biryani, currys et naans",
+  description: "Commandez poulet au beurre, biryani, naan et spécialités maison chez Masala Hub.",
+  other: { google: "notranslate" },
 };
 
 export default function RootLayout({
@@ -36,8 +37,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fr" suppressHydrationWarning>
-      <body className={`${nunito.variable} ${cormorant.variable} ${script.variable} antialiased`} suppressHydrationWarning>
+    <html lang="fr" translate="no" className="notranslate" suppressHydrationWarning>
+      <body className={`${nunito.variable} ${cormorant.variable} ${script.variable} notranslate antialiased`} translate="no" suppressHydrationWarning>
         <LanguageProvider>
           <AuthProvider>
             <CatalogProvider>

@@ -22,7 +22,7 @@ export default function CategoryMenuPage({ params }: { params: Promise<{ slug: s
         <Link href="/menu" className="inline-flex items-center gap-2 text-terra font-semibold mb-6">
           <ArrowLeft className="w-4 h-4" /> {t("Full menu", "Menu complet")}
         </Link>
-        <h1 className="script-title text-6xl sm:text-7xl mb-3">{title}</h1>
+        <h1 className="script-title mb-3 text-4xl sm:text-6xl lg:text-7xl">{title}</h1>
         <p className="text-muted mb-8">
           {slug === "specialites"
             ? t("Each specialty is served with basmati rice.", "Chaque spécialité est servie avec du riz basmati.")

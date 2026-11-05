@@ -5,6 +5,7 @@ import { Bike, CheckCircle, CookingPot, Home, Store } from "lucide-react";
 import { SiteShell } from "../components/SiteShell";
 import { useLanguage } from "../context/LanguageContext";
 import { errorText } from "../lib/errors";
+import { dishName } from "../data/menuData";
 import { formatPrice } from "../lib/pricing";
 import { PAYMENT_STATUS_LABEL, STATUS_LABEL } from "../lib/orders";
 import { apiFetch } from "../lib/clientApi";
@@ -69,7 +70,7 @@ export default function TrackOrderPage() {
   return (
     <SiteShell>
       <main className="max-w-3xl mx-auto px-4 py-12">
-        <h1 className="script-title text-6xl text-center mb-6">{t("Track an order", "Suivre une commande")}</h1>
+        <h1 className="script-title mb-6 text-center text-4xl sm:text-6xl">{t("Track an order", "Suivre une commande")}</h1>
         <form
           onSubmit={(event) => {
             event.preventDefault();
@@ -115,8 +116,8 @@ export default function TrackOrderPage() {
             )}
             <ul className="space-y-2 text-sm">
               {order.items.map((item) => (
-                <li key={item.id} className="flex justify-between gap-3">
-                  <span>{item.quantity} × {item.name}{item.optionsLabel ? ` (${item.optionsLabel})` : ""}</span>
+                <li key={item.id} className="money-row">
+                  <span>{item.quantity} × {dishName(item.name, lang)}{item.optionsLabel ? ` (${dishName(item.optionsLabel, lang)})` : ""}</span>
                   <span>{formatPrice(item.price * item.quantity)}</span>
                 </li>
               ))}

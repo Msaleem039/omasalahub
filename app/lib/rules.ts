@@ -205,7 +205,7 @@ export function orderingDecision(
     if (openNow) return { ok: true as const, scheduledFor: null as string | null };
     return { ok: false as const, code: "closed", nextOpenAt: nextOpening(now, settings, closures, service) };
   }
-  if (!settings.allowScheduled) return { ok: false as const, code: "schedule_disabled" };
+  if (!settings.allowScheduled && service !== "pickup") return { ok: false as const, code: "schedule_disabled" };
   const when = wallTimeToUtc(scheduled.date, scheduled.time, settings.timezone);
   if (!when) return { ok: false as const, code: "bad_schedule" };
   if (when.getTime() < now.getTime() + settings.prepMinutes * 60000) return { ok: false as const, code: "too_soon" };

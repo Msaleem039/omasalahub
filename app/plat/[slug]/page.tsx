@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ProductView } from "../../components/ProductView";
-import { DISHES, dishSlug, type Dish } from "../../data/menuData";
+import { DISHES, dishDescription, dishName, dishSlug, type Dish } from "../../data/menuData";
 import { API_BASE } from "../../lib/clientApi";
 import type { MenuProduct } from "../../lib/types";
 
@@ -64,12 +64,12 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const product = loaded?.product;
   if (!product) return { title: "Plat · Masala Hub" };
   return {
-    title: `${product.name} · Masala Hub`,
-    description: product.description,
+    title: `${dishName(product.name, "fr")} · Masala Hub`,
+    description: dishDescription(product.description, "fr"),
     alternates: { canonical: `/plat/${product.slug}` },
     openGraph: {
-      title: product.name,
-      description: product.description,
+      title: dishName(product.name, "fr"),
+      description: dishDescription(product.description, "fr"),
       images: product.image.startsWith("data:") ? undefined : [product.image],
     },
   };
@@ -83,8 +83,8 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   const jsonLd: Record<string, unknown> = {
     "@context": "https://schema.org",
     "@type": "Product",
-    name: product.name,
-    description: product.description,
+    name: dishName(product.name, "fr"),
+    description: dishDescription(product.description, "fr"),
     image: product.image.startsWith("data:") ? undefined : product.image,
     category: product.category,
     offers: {

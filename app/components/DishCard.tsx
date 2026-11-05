@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { Check, Heart, Plus, Star } from "lucide-react";
 import { DishImage } from "./DishImage";
-import { dishDescription, dishPath, type Dish } from "../data/menuData";
+import { dishDescription, dishName, dishPath, type Dish } from "../data/menuData";
 import { formatPrice } from "../lib/pricing";
 import { useCart } from "../context/CartContext";
 import { useWishlist } from "../context/WishlistContext";
@@ -52,12 +52,12 @@ export function DishCard({ dish }: { dish: Dish }) {
     <article className="bg-card rounded-[1.6rem] border border-[#e5dcc8] shadow-[0_12px_30px_rgba(20,53,40,0.06)] p-3 flex flex-col">
       <div className="relative h-52 rounded-[1.25rem] overflow-hidden bg-cream-deep">
         <Link href={dishPath(dish)} className="absolute inset-0 block">
-          <DishImage src={dish.image} alt={dish.name} />
+          <DishImage src={dish.image} alt={dishName(dish.name, lang)} />
         </Link>
         <button
           type="button"
           onClick={toggleSaved}
-          aria-label={saved ? t(`Remove ${dish.name} from wishlist`, `Retirer ${dish.name} de la liste`) : t(`Save ${dish.name}`, `Enregistrer ${dish.name}`)}
+          aria-label={saved ? t(`Remove ${dishName(dish.name, lang)} from wishlist`, `Retirer ${dishName(dish.name, lang)} de la liste`) : t(`Save ${dishName(dish.name, lang)}`, `Enregistrer ${dishName(dish.name, lang)}`)}
           className={`absolute top-3 right-3 z-10 h-9 w-9 rounded-full flex items-center justify-center shadow-sm ${
             saved ? "bg-terra text-ink" : "bg-white/90 text-ink"
           }`}
@@ -69,7 +69,7 @@ export function DishCard({ dish }: { dish: Dish }) {
       <div className="px-2 pt-4 pb-2 flex flex-col flex-1">
         <div className="flex items-start justify-between gap-3">
           <h3 className="font-serif text-[1.35rem] leading-tight text-ink">
-            <Link href={dishPath(dish)} className="hover:text-terra-deep">{dish.name}</Link>
+            <Link href={dishPath(dish)} className="hover:text-terra-deep">{dishName(dish.name, lang)}</Link>
           </h3>
           {dish.reviewCount ? (
             <span className="flex items-center gap-1 text-xs font-bold text-amber-700 shrink-0">
@@ -80,9 +80,9 @@ export function DishCard({ dish }: { dish: Dish }) {
           ) : null}
         </div>
         <p className="text-sm text-muted mt-2 leading-relaxed line-clamp-2">{dishDescription(dish.description, lang)}</p>
-        <div className="mt-4 flex items-center justify-between gap-3">
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
           <span className="text-lg font-extrabold text-terra">{formatPrice(dish.price)}</span>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             {customizable && (
               <Link href={dishPath(dish)} className="text-sm font-bold text-sage">
                 {t("Customise", "Personnaliser")}

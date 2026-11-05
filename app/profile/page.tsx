@@ -40,7 +40,7 @@ export default function ProfilePage() {
         {!ready ? <div className="h-40 animate-pulse rounded-3xl bg-card" /> : null}
         {ready && !user && (
           <div className="rounded-3xl border border-[#e5dcc8] bg-card p-8 text-center">
-            <h1 className="script-title text-6xl">{t("Your account", "Votre compte")}</h1>
+            <h1 className="script-title text-4xl sm:text-6xl">{t("Your account", "Votre compte")}</h1>
             <p className="mt-3 text-muted">{t("Log in to see your details and orders.", "Connectez-vous pour voir vos informations et vos commandes.")}</p>
             <Link href="/login" className="mt-6 inline-flex rounded-full bg-terra px-6 py-3 font-bold text-ink">{t("Log in", "Connexion")}</Link>
           </div>
@@ -48,7 +48,7 @@ export default function ProfilePage() {
         {user && (
           <>
             <div>
-              <h1 className="script-title text-6xl leading-none">{user.name}</h1>
+              <h1 className="script-title text-4xl leading-tight sm:text-6xl">{user.name}</h1>
               <p className="text-sm text-muted">{user.email}</p>
             </div>
             {user.role === "customer" ? (

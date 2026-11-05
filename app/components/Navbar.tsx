@@ -34,7 +34,7 @@ export const Navbar: React.FC = () => {
     <>
       <header className="sticky top-0 z-50 bg-forest text-cream shadow-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between min-h-[4.5rem] gap-4 py-2">
+          <div className="flex items-center justify-between min-h-16 gap-2 py-2 sm:min-h-[4.5rem] sm:gap-4">
             <Link href="/" className="leading-none" aria-label="Omasalahub home">
               <Logo />
             </Link>
@@ -47,12 +47,12 @@ export const Navbar: React.FC = () => {
               ))}
             </nav>
 
-            <div className="flex items-center gap-1">
+            <div className="flex shrink-0 items-center">
               <div className="flex overflow-hidden rounded-full border border-white/20 text-[11px] font-bold">
                 <button
                   type="button"
                   onClick={() => setLang("fr")}
-                  className={`px-2 py-1 ${lang === "fr" ? "bg-terra text-ink" : "text-cream"}`}
+                  className={`px-1.5 py-1 sm:px-2 ${lang === "fr" ? "bg-terra text-ink" : "text-cream"}`}
                   aria-label="Français"
                 >
                   FR
@@ -60,13 +60,13 @@ export const Navbar: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setLang("en")}
-                  className={`px-2 py-1 ${lang === "en" ? "bg-terra text-ink" : "text-cream"}`}
+                  className={`px-1.5 py-1 sm:px-2 ${lang === "en" ? "bg-terra text-ink" : "text-cream"}`}
                   aria-label="English"
                 >
                   EN
                 </button>
               </div>
-              <Link href="/wishlist" className="p-2 relative text-cream/85 hover:text-terra" aria-label="Wishlist">
+              <Link href="/wishlist" className="relative p-1.5 text-cream/85 hover:text-terra sm:p-2" aria-label="Wishlist">
                 <Heart className="w-5 h-5" />
                 {wishlist.length > 0 && (
                   <span className="absolute -top-0.5 -right-0.5 bg-terra text-ink text-[10px] font-bold rounded-full min-w-4 h-4 px-1 flex items-center justify-center">
@@ -74,7 +74,7 @@ export const Navbar: React.FC = () => {
                   </span>
                 )}
               </Link>
-              <Link href="/cart" className="p-2 relative text-cream/85 hover:text-terra" aria-label="Cart">
+              <Link href="/cart" className="relative p-1.5 text-cream/85 hover:text-terra sm:p-2" aria-label="Cart">
                 <ShoppingBag className="w-5 h-5" />
                 {cartCount > 0 && (
                   <span className="absolute -top-0.5 -right-0.5 bg-terra text-ink text-[10px] font-bold rounded-full min-w-4 h-4 px-1 flex items-center justify-center">
@@ -82,13 +82,13 @@ export const Navbar: React.FC = () => {
                   </span>
                 )}
               </Link>
-              <Link href="/profile" className="p-2 text-cream/85 hover:text-terra" aria-label={t("Account", "Compte")}>
+              <Link href="/profile" className="p-1.5 text-cream/85 hover:text-terra sm:p-2" aria-label={t("Account", "Compte")}>
                 <User className="w-5 h-5" />
               </Link>
               <button
                 type="button"
                 onClick={() => setMobileMenuOpen((open) => !open)}
-                className="md:hidden p-2 text-cream"
+                className="p-1.5 text-cream md:hidden sm:p-2"
                 aria-label={mobileMenuOpen ? t("Close menu", "Fermer le menu") : t("Open menu", "Ouvrir le menu")}
               >
                 {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}

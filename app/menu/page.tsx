@@ -4,7 +4,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Search, UtensilsCrossed } from "lucide-react";
 import { SiteShell } from "../components/SiteShell";
 import { DishCard } from "../components/DishCard";
-import { CATEGORIES, categoryLabel, dishDescription, type MenuCategory } from "../data/menuData";
+import { CATEGORIES, categoryLabel, dishDescription, dishName, type MenuCategory } from "../data/menuData";
 import { useCatalog } from "../context/CatalogContext";
 import { useLanguage } from "../context/LanguageContext";
 
@@ -26,6 +26,8 @@ export default function MenuPage() {
       const matchesSearch =
         q === "" ||
         dish.name.toLowerCase().includes(q) ||
+        dishName(dish.name, "fr").toLowerCase().includes(q) ||
+        dishName(dish.name, "en").toLowerCase().includes(q) ||
         dish.description.toLowerCase().includes(q) ||
         dishDescription(dish.description, "fr").toLowerCase().includes(q) ||
         dishDescription(dish.description, "en").toLowerCase().includes(q) ||
@@ -40,7 +42,7 @@ export default function MenuPage() {
     <SiteShell>
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full">
         <div className="text-center mb-8">
-          <h1 className="script-title text-7xl">{t("The Menu", "La carte")}</h1>
+          <h1 className="script-title text-5xl sm:text-7xl">{t("The Menu", "La carte")}</h1>
           <p className="text-muted mt-2">{t("Specialties with basmati rice. Pizzas with sauce faite maison.", "Spécialités avec riz basmati. Pizzas à la sauce faite maison.")}</p>
         </div>
 
@@ -81,7 +83,7 @@ export default function MenuPage() {
               if (dishes.length === 0) return null;
               return (
                 <section key={category.slug}>
-                  <h2 className="script-title text-5xl mb-5">{categoryLabel(category.slug, lang)}</h2>
+                  <h2 className="script-title mb-5 text-4xl sm:text-5xl">{categoryLabel(category.slug, lang)}</h2>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     {dishes.map((dish) => (
                       <DishCard key={dish.id} dish={dish} />
@@ -94,7 +96,7 @@ export default function MenuPage() {
         ) : (
           <div>
             {selectedCat !== "all" && (
-              <h2 className="script-title text-5xl mb-5">{categoryLabel(selectedCat as MenuCategory, lang)}</h2>
+              <h2 className="script-title mb-5 text-4xl sm:text-5xl">{categoryLabel(selectedCat as MenuCategory, lang)}</h2>
             )}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {filtered.map((dish) => (

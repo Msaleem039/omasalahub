@@ -1,11 +1,12 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { DishImage } from "./DishImage";
+import { OrderTypeDialog, ORDER_SERVICE_KEY } from "./OrderTypeDialog";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { dishDescription, type Dish } from "../data/menuData";
+import { dishDescription, dishName, type Dish } from "../data/menuData";
 import { formatPrice } from "../lib/pricing";
 import { useCatalog } from "../context/CatalogContext";
 import { useLanguage } from "../context/LanguageContext";
@@ -32,6 +33,8 @@ function placement(index: number, active: number, count: number) {
 export const Hero: React.FC = () => {
   const { t, lang } = useLanguage();
   const { dishes, info } = useCatalog();
+  const router = useRouter();
+  const [orderOpen, setOrderOpen] = useState(false);
   const heroDishes = HERO_IDS.map((id) => dishes.find((dish) => dish.id === id)).filter((dish): dish is Dish => Boolean(dish));
   const slides = heroDishes.length > 0 ? heroDishes : dishes.slice(0, 6);
   const [active, setActive] = useState(0);
@@ -89,18 +92,19 @@ export const Hero: React.FC = () => {
               exit={reduced ? undefined : { opacity: 0, y: -8 }}
               transition={{ duration: reduced ? 0 : 0.35 }}
             >
-              <h1 className="font-serif text-5xl sm:text-6xl text-ink mt-3 leading-none">{dish.name}</h1>
+              <h1 className="mt-3 break-words font-serif text-4xl leading-none text-ink sm:text-5xl lg:text-6xl">{dishName(dish.name, lang)}</h1>
               <p className="mt-5 max-w-md text-muted leading-relaxed">{dishDescription(dish.description, lang)}</p>
               <p className="mt-4 text-2xl font-extrabold text-terra">{formatPrice(dish.price)}</p>
             </motion.div>
           </AnimatePresence>}
           {dish && (
-          <Link
-            href={`/menu/${dish.category}`}
+          <button
+            type="button"
+            onClick={() => setOrderOpen(true)}
             className="inline-flex mt-8 bg-terra hover:bg-terra-deep text-ink font-bold px-8 py-3.5 rounded-full shadow-lg shadow-terra/20"
           >
-            {t("Order Now", "Commander")}
-          </Link>
+            {t("Order online", "Commander en ligne")}
+          </button>
           )}
         </div>
 
@@ -131,7 +135,7 @@ export const Hero: React.FC = () => {
                 <motion.button
                   key={item.id}
                   type="button"
-                  aria-label={isActive ? item.name : t(`Show ${item.name}`, `Afficher ${item.name}`)}
+                  aria-label={isActive ? dishName(item.name, lang) : t(`Show ${dishName(item.name, lang)}`, `Afficher ${dishName(item.name, lang)}`)}
                   aria-current={isActive ? "true" : undefined}
                   onClick={() => setActive(index)}
                   initial={false}
@@ -142,7 +146,7 @@ export const Hero: React.FC = () => {
                     isActive ? "border-white cursor-default" : "border-white/90 cursor-pointer"
                   }`}
                 >
-                  <DishImage src={item.image} alt={item.name} priority={index === 0} sizes="(max-width: 1024px) 42vw, 280px" />
+                  <DishImage src={item.image} alt={dishName(item.name, lang)} priority={index === 0} sizes="(max-width: 1024px) 42vw, 280px" />
                 </motion.button>
               );
             })}
@@ -158,7 +162,7 @@ export const Hero: React.FC = () => {
               <ChevronLeft className="h-5 w-5" />
             </button>
             <p className="sr-only" aria-live="polite">
-              {dish ? `${dish.name}, ${formatPrice(dish.price)}` : ""}
+              {dish ? `${dishName(dish.name, lang)}, ${formatPrice(dish.price)}` : ""}
             </p>
             <button
               type="button"
@@ -171,6 +175,15 @@ export const Hero: React.FC = () => {
           </div>
         </div>
       </div>
+      <OrderTypeDialog
+        open={orderOpen}
+        onClose={() => setOrderOpen(false)}
+        onChoose={(service) => {
+          sessionStorage.setItem(ORDER_SERVICE_KEY, service);
+          setOrderOpen(false);
+          if (dish) router.push(`/menu/${dish.category}`);
+        }}
+      />
     </section>
   );
 };

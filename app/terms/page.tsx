@@ -11,7 +11,7 @@ export default function TermsPage() {
   return (
     <SiteShell>
       <main className="max-w-3xl mx-auto px-4 py-14">
-        <h1 className="script-title text-7xl">{t("Terms", "Conditions")}</h1>
+        <h1 className="script-title text-5xl sm:text-7xl">{t("Terms", "Conditions")}</h1>
         <div className="mt-6 space-y-4 text-muted leading-relaxed">
           <p>
             {t(

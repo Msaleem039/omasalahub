@@ -24,7 +24,7 @@ export const Footer = () => {
           <p className="text-sm text-cream/70 leading-relaxed">
             {t(
               "Butter chicken, biryani, stuffed naan, and house lassi, prepared fresh and delivered to your door.",
-              "Butter chicken, biryani, naan garni et lassi maison, préparés frais et livrés chez vous."
+              "Poulet au beurre, biryani, naan garni et lassi maison, préparés frais et livrés chez vous."
             )}
           </p>
         </div>

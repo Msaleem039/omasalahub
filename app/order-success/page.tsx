@@ -6,6 +6,7 @@ import { ArrowRight, CheckCircle2 } from "lucide-react";
 import confetti from "canvas-confetti";
 import { SiteShell } from "../components/SiteShell";
 import { useLanguage } from "../context/LanguageContext";
+import { dishName } from "../data/menuData";
 import { formatPrice } from "../lib/pricing";
 import { METHOD_LABEL, PAYMENT_STATUS_LABEL, STATUS_LABEL } from "../lib/orders";
 import { apiFetch } from "../lib/clientApi";
@@ -48,11 +49,11 @@ export default function OrderSuccessPage() {
   return (
     <SiteShell>
       <main className="max-w-xl mx-auto px-4 py-16">
-        <div className="bg-card rounded-[2rem] border border-[#e5dcc8] p-8 sm:p-10 text-center shadow-sm">
+        <div className="rounded-[2rem] border border-[#e5dcc8] bg-card p-5 text-center shadow-sm sm:p-10">
           <div className="mx-auto mb-4 w-16 h-16 rounded-full bg-sage-soft text-sage flex items-center justify-center">
             <CheckCircle2 className="w-9 h-9" />
           </div>
-          <h1 className="script-title text-6xl">{t("Order recorded", "Commande enregistrée")}</h1>
+          <h1 className="script-title text-4xl sm:text-6xl">{t("Order recorded", "Commande enregistrée")}</h1>
           <p className="mt-2 font-bold">{t("Order with obligation to pay", "Commande avec obligation de paiement")}</p>
           {order ? (
             <div className="mt-4 text-left space-y-3 text-sm">
@@ -63,15 +64,15 @@ export default function OrderSuccessPage() {
               <ul className="bg-cream rounded-2xl p-4 space-y-2">
                 {order.items.map((item) => (
                   <li key={item.id}>
-                    <div className="flex justify-between gap-3">
-                      <span>{item.quantity} × {item.name}</span>
+                    <div className="money-row">
+                      <span>{item.quantity} × {dishName(item.name, lang)}</span>
                       <span>{formatPrice(item.price * item.quantity)}</span>
                     </div>
                     {item.optionsLabel && <p className="text-xs text-muted">{item.optionsLabel}</p>}
                   </li>
                 ))}
               </ul>
-              <div className="flex justify-between font-bold px-1">
+              <div className="money-row px-1 font-bold">
                 <span>{t("Amount due", "Montant dû")}</span>
                 <span>{formatPrice(order.total)}</span>
               </div>
@@ -83,7 +84,12 @@ export default function OrderSuccessPage() {
                     : t("Online payment is still pending. Opening this page does not mark the order as paid.", "Le paiement en ligne est encore en attente. Ouvrir cette page ne marque pas la commande comme payée.")}
               </p>
               {order.service === "delivery" && order.customer.address && <p className="text-muted px-1">{t("Delivery to", "Livraison à")} {order.customer.address}</p>}
-              {order.service === "pickup" && <p className="text-muted px-1">{t("Pickup at the restaurant.", "Retrait au restaurant.")}</p>}
+              {order.service === "pickup" && (
+                <p className="text-muted px-1">
+                  {t("Takeaway at the restaurant.", "À emporter au restaurant.")}
+                  {order.scheduledFor ? ` ${new Intl.DateTimeFormat(lang === "fr" ? "fr-FR" : "en-GB", { dateStyle: "medium", timeStyle: "short" }).format(new Date(order.scheduledFor))}` : ""}
+                </p>
+              )}
             </div>
           ) : (
             <p className="text-muted mt-3">

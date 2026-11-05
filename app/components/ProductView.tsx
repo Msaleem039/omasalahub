@@ -6,7 +6,7 @@ import { Minus, Plus, Star } from "lucide-react";
 import { SiteShell } from "./SiteShell";
 import { DishImage } from "./DishImage";
 import { ProductReviews } from "./ProductReviews";
-import { categoryLabel, dishDescription, dishPath, type Dish } from "../data/menuData";
+import { categoryLabel, dishDescription, dishName, dishPath, type Dish } from "../data/menuData";
 import { formatPrice } from "../lib/pricing";
 import { useCart } from "../context/CartContext";
 import { useLanguage } from "../context/LanguageContext";
@@ -58,23 +58,23 @@ export function ProductView({ product, related }: { product: Dish; related: Dish
   return (
     <SiteShell>
       <main className="mx-auto w-full max-w-6xl px-4 py-8 pb-28 sm:px-6 sm:pb-12 lg:px-8">
-        <nav className="mb-6 text-sm text-muted" aria-label="Breadcrumb">
+        <nav className="mb-6 flex flex-wrap gap-x-1 text-sm text-muted" aria-label="Breadcrumb">
           <Link href="/" className="hover:text-terra">{t("Home", "Accueil")}</Link>
           <span> / </span>
           <Link href="/menu" className="hover:text-terra">{t("Menu", "Menu")}</Link>
           <span> / </span>
           <Link href={`/menu/${product.category}`} className="hover:text-terra">{categoryLabel(product.category, lang)}</Link>
           <span> / </span>
-          <span className="text-ink">{product.name}</span>
+          <span className="text-ink">{dishName(product.name, lang)}</span>
         </nav>
 
         <div className="grid items-start gap-8 lg:grid-cols-2">
-          <div className="relative h-80 overflow-hidden rounded-[2rem] border border-[#e5dcc8] bg-cream-deep sm:h-[28rem]">
-            <DishImage src={product.image} alt={product.name} priority sizes="(max-width: 1024px) 100vw, 50vw" />
+          <div className="relative h-64 overflow-hidden rounded-[2rem] border border-[#e5dcc8] bg-cream-deep sm:h-80 lg:h-[28rem]">
+            <DishImage src={product.image} alt={dishName(product.name, lang)} priority sizes="(max-width: 1024px) 100vw, 50vw" />
           </div>
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.16em] text-sage">{categoryLabel(product.category, lang)}</p>
-            <h1 className="mt-2 font-serif text-5xl leading-none">{product.name}</h1>
+            <h1 className="mt-2 break-words font-serif text-4xl leading-tight sm:text-5xl">{dishName(product.name, lang)}</h1>
             <div className="mt-3 flex flex-wrap items-center gap-3">
               <p className="text-2xl font-extrabold text-terra">{formatPrice(product.price)}</p>
               <span className="text-xs font-bold text-muted">{t("Tax included", "Prix TTC")}</span>
@@ -145,7 +145,7 @@ export function ProductView({ product, related }: { product: Dish; related: Dish
                             setExtras((current) => event.target.checked ? [...current, extra.id] : current.filter((id) => id !== extra.id))
                           }
                         />
-                        {extra.name}
+                        {dishName(extra.name, lang)}
                       </span>
                       <span className="font-bold">+{formatPrice(extra.price)}</span>
                     </label>
@@ -173,8 +173,8 @@ export function ProductView({ product, related }: { product: Dish; related: Dish
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
               {related.map((item) => (
                 <Link key={item.id} href={dishPath(item)} className="rounded-3xl border border-[#e5dcc8] bg-card p-3">
-                  <div className="relative h-32 overflow-hidden rounded-2xl"><DishImage src={item.image} alt={item.name} /></div>
-                  <p className="mt-3 font-serif text-2xl">{item.name}</p>
+                  <div className="relative h-32 overflow-hidden rounded-2xl"><DishImage src={item.image} alt={dishName(item.name, lang)} /></div>
+                  <p className="mt-3 font-serif text-2xl">{dishName(item.name, lang)}</p>
                   <p className="font-bold text-terra">{formatPrice(item.price)}</p>
                 </Link>
               ))}

@@ -7,6 +7,7 @@ import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
 import { useCatalog } from "../context/CatalogContext";
 import { useLanguage } from "../context/LanguageContext";
+import { dishName } from "../data/menuData";
 import { formatPrice } from "../lib/pricing";
 import { METHOD_LABEL, PAYMENT_STATUS_LABEL, STATUS_LABEL } from "../lib/orders";
 import { apiFetch } from "../lib/clientApi";
@@ -63,7 +64,7 @@ export default function OrdersPage() {
   return (
     <SiteShell>
       <main className="mx-auto w-full max-w-3xl px-4 py-12">
-        <h1 className="script-title text-6xl mb-6">{t("Your orders", "Vos commandes")}</h1>
+        <h1 className="script-title mb-6 text-4xl sm:text-6xl">{t("Your orders", "Vos commandes")}</h1>
         {!ready ? <div className="h-32 animate-pulse rounded-3xl bg-card" /> : null}
         {ready && !user && (
           <p className="text-muted">
@@ -86,12 +87,15 @@ export default function OrdersPage() {
                 </div>
                 <p className="font-bold">{formatPrice(order.total)}</p>
               </div>
-              <p className="mt-2 text-sm">
-                {t(STATUS_LABEL[order.status].en, STATUS_LABEL[order.status].fr)} · {t(PAYMENT_STATUS_LABEL[order.paymentStatus].en, PAYMENT_STATUS_LABEL[order.paymentStatus].fr)} · {t(METHOD_LABEL[order.paymentMethod].en, METHOD_LABEL[order.paymentMethod].fr)}
+              <p className="mt-2 break-words text-sm">
+                {order.service === "pickup" ? t("Takeaway", "À emporter") : t("Home delivery", "Livraison")} · {t(STATUS_LABEL[order.status].en, STATUS_LABEL[order.status].fr)} · {t(PAYMENT_STATUS_LABEL[order.paymentStatus].en, PAYMENT_STATUS_LABEL[order.paymentStatus].fr)} · {t(METHOD_LABEL[order.paymentMethod].en, METHOD_LABEL[order.paymentMethod].fr)}
               </p>
+              {order.service === "pickup" && order.scheduledFor && (
+                <p className="text-sm text-muted">{t("Pickup time", "Heure de retrait")}: {new Intl.DateTimeFormat(lang === "fr" ? "fr-FR" : "en-GB", { dateStyle: "medium", timeStyle: "short" }).format(new Date(order.scheduledFor))}</p>
+              )}
               <ul className="mt-3 space-y-1 text-sm">
                 {order.items.map((item) => (
-                  <li key={item.id}>{item.quantity} × {item.name}{item.optionsLabel ? ` (${item.optionsLabel})` : ""}</li>
+                  <li key={item.id}>{item.quantity} × {dishName(item.name, lang)}{item.optionsLabel ? ` (${dishName(item.optionsLabel, lang)})` : ""}</li>
                 ))}
               </ul>
               <div className="mt-4 flex flex-wrap gap-3">

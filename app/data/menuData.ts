@@ -120,7 +120,7 @@ export const DISHES: Dish[] = [
     category: "biryanis",
     price: 12.9,
     rating: 4.9,
-    image: img("photo-1563379091339-03b21ab4a4f8"),
+    image: "/image/buryani.jpg",
     description: "Chicken biryani layered with saffron basmati rice and fried onions.",
   },
   {
@@ -306,6 +306,39 @@ const DESCRIPTION_PAIRS: [string, string][] = [
 export function dishDescription(description: string, lang: "en" | "fr") {
   const pair = DESCRIPTION_PAIRS.find(([en, fr]) => description === en || description === fr);
   if (!pair) return description;
+  return lang === "fr" ? pair[1] : pair[0];
+}
+
+const NAME_PAIRS: [string, string][] = [
+  ["Butter Chicken", "Poulet au beurre"],
+  ["Chicken Masala", "Poulet masala"],
+  ["Chicken Tikka Masala", "Poulet tikka masala"],
+  ["Chicken Balti", "Poulet balti"],
+  ["Poulet Shahi Korma", "Poulet shahi korma"],
+  ["Dal Tadka", "Dal tadka"],
+  ["Biryani Poulet", "Biryani poulet"],
+  ["Biryani Végétarien", "Biryani végétarien"],
+  ["Naan Poulet", "Naan poulet"],
+  ["Naan Chicken Masala", "Naan poulet masala"],
+  ["Cheese Naan", "Naan au fromage"],
+  ["Pizza Chicken", "Pizza au poulet"],
+  ["Pizza Butter Chicken", "Pizza poulet au beurre"],
+  ["Samosa (2 pièces)", "Samosas (2 pièces)"],
+  ["Pakora Légumes (4 pièces)", "Pakoras de légumes (4 pièces)"],
+  ["Menu Butter Chicken", "Menu poulet au beurre"],
+  ["Menu Pizza", "Menu pizza"],
+  ["Menu Naan", "Menu naan"],
+  ["Lassi Mangue", "Lassi mangue"],
+  ["Lassi Rose", "Lassi rose"],
+  ["Lassi Nature", "Lassi nature"],
+  ["Boisson 33 cl", "Boisson 33 cl"],
+  ["Supplément fromage", "Supplément fromage"],
+  ["Sauce", "Sauce"],
+];
+
+export function dishName(name: string, lang: "en" | "fr") {
+  const pair = NAME_PAIRS.find(([en, fr]) => name === en || name === fr);
+  if (!pair) return name;
   return lang === "fr" ? pair[1] : pair[0];
 }
 

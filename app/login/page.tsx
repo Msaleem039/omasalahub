@@ -45,7 +45,7 @@ export default function LoginPage() {
   return (
     <SiteShell>
       <main className="max-w-md mx-auto px-4 py-16">
-        <form onSubmit={submit} className="bg-card rounded-[2rem] border border-[#e4d8c4] p-8 shadow-sm space-y-4">
+        <form onSubmit={submit} className="space-y-4 rounded-[2rem] border border-[#e4d8c4] bg-card p-5 shadow-sm sm:p-8">
           <h1 className="font-serif text-4xl text-ink">{mode === "login" ? t("Log in", "Connexion") : t("Create an account", "Créer un compte")}</h1>
           <p className="text-sm text-muted">{t("Customers and the restaurant use the same sign-in.", "Les clients et le restaurant utilisent la même connexion.")}</p>
           {mode === "register" && (
